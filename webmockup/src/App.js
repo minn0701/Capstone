@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom
 import { useState } from "react";
 import ENSMMockup from "./ENSMMockup";
 
+
+import LoginPage from "./pages/LoginPage";
 import SystemNameEdit from "./pages/ensm/SystemNameEdit";
 import AccessRangeEdit from "./pages/ensm/AccessRangeEdit";
 import CronManagement from "./pages/system/CronManagement";
@@ -19,9 +21,14 @@ import Dashboard from "./pages/Dashboard"; // 홈 대체할 컴포넌트
 
 function LayoutWrapper() {
   const [selectedDocKey, setSelectedDocKey] = useState(null);
+  const [docContent, setDocContent] = useState("");
+
   return (
-    <ENSMMockup selectedDocKey={selectedDocKey} setSelectedDocKey={setSelectedDocKey}>
-      <Outlet context={setSelectedDocKey} />
+    <ENSMMockup
+        selectedDocKey={selectedDocKey}
+        setSelectedDocKey={setSelectedDocKey}
+        docContent={docContent}>
+      <Outlet context={{ setSelectedDocKey, setDocContent }} />
     </ENSMMockup>
   );
 }
@@ -31,7 +38,8 @@ function App() {
     <Router>
       <Routes>
         <Route element={<LayoutWrapper />}>
-          <Route path="/" element={<Dashboard />} />  
+          <Route path="/" element={<LoginPage />} />  
+          <Route path="/DashBoard" element={<Dashboard />} />
           <Route path="/ensm/시스템이름수정" element={<SystemNameEdit />} />
           <Route path="/ensm/접속가능범위수정" element={<AccessRangeEdit />} />
           <Route path="/system/cron" element={<CronManagement />} />

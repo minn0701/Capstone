@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+// ApacheConfig.jsx 수정본 - 힌트창 내부에 📄 문서버튼과 ❌ 닫기버튼 배치
+import React, { useState, useRef } from "react";
 import { HelpCircle } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 
@@ -6,74 +7,112 @@ export default function ApacheConfig() {
   const [showHint, setShowHint] = useState(null);
   const [toggles, setToggles] = useState({});
   const hintRefs = useRef({});
-  const setSelectedDocKey = useOutletContext(); // 설명 사이드바 키 설정
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!Object.values(hintRefs.current).some((ref) => ref && ref.contains(e.target))) {
-        setShowHint(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const { setSelectedDocKey, setDocContent } = useOutletContext();
 
   const toggleSwitch = (key) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+const loadMarkdown = async (label) => {
+  try {
+    const response = await fetch(`/descriptions/${label}.md`);
+    const text = await response.text();
+    setDocContent(text);
+    setSelectedDocKey(label);
+  } catch (err) {
+    console.error(`❌ 설명서 로드 실패: ${label}`, err);
+    setDocContent("설명을 불러오는 데 실패했습니다.");
+    setSelectedDocKey(label);
+  }
+};
+
   const renderSetting = (label, input, hint, description) => (
-    <div style={{ marginBottom: "1.5rem", position: "relative" }}>
+    <div style={{ marginBottom: "1.5rem", position: "relative", zIndex: 0 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ width: "40%", position: "relative" }}>
           <label style={{ fontWeight: "bold", display: "flex", alignItems: "center" }}>
             {label}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowHint(showHint === label ? null : label);
-              }}
-              style={{ background: "none", border: "none", marginLeft: "8px", cursor: "pointer", color: "#ccc", position: "relative" }}
-              ref={(el) => (hintRefs.current[label] = el)}
-              title="힌트 보기"
-            >
-              <HelpCircle size={16} />
-            </button>
+            <span style={{ display: "flex", alignItems: "center", marginLeft: "8px" }}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowHint(label);
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#ccc",
+                  padding: 0,
+                  display: "flex",
+                  alignItems: "center"
+                }}
+                title="간단 설명 보기"
+                ref={(el) => (hintRefs.current[label] = el)}
+              >
+                <HelpCircle size={16} />
+              </button>
+            </span>
           </label>
           <div style={{ fontSize: "0.85rem", color: "#aaa", marginTop: "0.25rem" }}>{description}</div>
         </div>
         <div style={{ width: "55%", textAlign: "right" }}>{input}</div>
       </div>
-      {showHint === label && hintRefs.current[label] && (
-        <div
-          style={{
-            position: "absolute",
-            left: hintRefs.current[label].offsetLeft,
-            top: hintRefs.current[label].offsetTop + 24,
-            backgroundColor: "#fff",
-            color: "black",
-            padding: "10px 12px",
-            borderRadius: "8px",
-            boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-            minWidth: "240px",
-            zIndex: 9999
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-            <strong>{label}</strong>
-            <span
-              style={{ fontSize: "0.85rem", color: "#3366cc", cursor: "pointer", zIndex : 9999 }}
-              onClick={() => {
-                console.log("자세히 보기 클릭됨: ", label); // ✅ 여기에 로그 추가됨
-                setSelectedDocKey(label);
-              }}
-            >
-              자세히 보기
-            </span>
-          </div>
-          <div style={{ fontSize: "0.9rem" }}>{hint}</div>
-        </div>
-      )}
+{showHint === label && (
+  <div
+    style={{
+      position: "absolute",
+      left: hintRefs.current[label]?.offsetLeft ?? 0,
+      top: (hintRefs.current[label]?.offsetTop ?? 0) + 24,
+      backgroundColor: "#fff",
+      color: "black",
+      padding: "10px 12px",
+      borderRadius: "8px",
+      boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+      minWidth: "240px",
+      zIndex: 9999
+    }}
+  >
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+      <strong>{label}</strong>
+      <span style={{ display: "flex", gap: "6px" }}>
+        {/* ✅ 설명서 보기 버튼 수정됨 */}
+<button
+  onClick={() => loadMarkdown(label)}
+  title="설명서 보기"
+  style={{
+    background: "none",
+    border: "none",
+    padding: 0,
+    margin: 0,
+    color: "#555", // 원하는 색으로 조정 가능
+    fontSize: "1.1rem", // 아이콘 크기 조정
+    cursor: "pointer"
+  }}
+>
+  📄
+</button>
+<button
+  onClick={() => setShowHint(null)}
+  title="닫기"
+  style={{
+    background: "none",
+    border: "none",
+    padding: 0,
+    margin: 0,
+    color: "#555",
+    fontSize: "1.1rem",
+    cursor: "pointer"
+  }}
+>
+  ❌
+</button>
+      </span>
+    </div>
+    <div style={{ fontSize: "0.9rem" }}>{hint}</div>
+  </div>
+)}
+
     </div>
   );
 
@@ -105,7 +144,6 @@ export default function ApacheConfig() {
       />
     </div>
   );
-
 
 
 return (
