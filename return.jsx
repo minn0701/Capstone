@@ -111,33 +111,28 @@ export default function ApacheConfig() {
 return (
     <div style={{ padding: "1rem", color: "white" }}>
       <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1.5rem" }}>
-        BIND DNS 서버 설정 (데모 UI)
+        Apache httpd.conf 설정 (데모 UI)
       </h2>
 
-
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-
-
-
-        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📂 /etc/named.conf파일</h3>
-        {renderSetting("listen-on port 53", <input type="email" placeholder="webmaster@example.com" style={inputStyle} />, "에러가 발생할 경우 이메일로 관리자에게 전송됩니다.", "서버 관리자 이메일 주소")} 
-        {renderSetting("listen-on-v6 port 53", <input type="text" placeholder="localhost" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
-        {renderSetting("forward", <select style={inputStyle} defaultValue="Prod">
-          <option value="only">only</option>
-          <option value="first">first</option>
+        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📂 Server Settings</h3>
+        {renderSetting("ServerAdmin", <input type="email" placeholder="webmaster@example.com" style={inputStyle} />, "에러가 발생할 경우 이메일로 관리자에게 전송됩니다.", "서버 관리자 이메일 주소")}
+        {renderSetting("ServerName", <input type="text" placeholder="localhost" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
+        {renderSetting("DocumentRoot", <input type="text" placeholder="/var/www/html" style={inputStyle} />, "웹 문서의 기본 경로를 지정합니다.", "웹 문서 루트 경로")}
+        {renderSetting("ServerTokens", <select style={inputStyle} defaultValue="Prod">
+          <option value="Full">Full</option>
+          <option value="OS">OS</option>
+          <option value="Minimal">Minimal</option>
+          <option value="Minor">Minor</option>
+          <option value="Major">Major</option>
+          <option value="Prod">Prod</option>
         </select>, "응답 헤더에 포함될 서버 정보의 범위를 지정합니다.", "서버 정보 노출 정도")}
-        {renderSetting("forwarders", <input type="text" placeholder="localhost" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
-        {renderSetting("allow-query", <input type="text" placeholder="192.168.0.1" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
-        {renderSetting("allow-transfer", <input type="text" placeholder="localhost" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}  
-        {renderSetting("listen-on port 53", <input type="text" placeholder="192.168.0.1" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
-        {renderSetting("acl",<input type="text" placeholder="member { 210.96.52.100; 203.247.40/24; 211.58.96.100; }" style={inputStyle}/>,
-        "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
+        {renderSetting("HostnameLookups", renderToggle("HostnameLookups"), "클라이언트의 IP를 호스트명으로 변환합니다. 비활성 권장.", "호스트 이름 조회 여부")}
+        {renderSetting("Timeout", <input type="number" placeholder="60" style={inputStyle} />, "요청 완료까지 기다릴 최대 시간(초)입니다.", "요청 대기 시간")}
       </div>
 
-
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📝 zone 구문</h3>
-        
+        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📝 Logging</h3>
         {renderSetting("LogLevel", <select style={inputStyle} defaultValue="warn">
           <option value="debug">debug</option>
           <option value="info">info</option>
