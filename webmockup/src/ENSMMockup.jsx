@@ -1,7 +1,7 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import ReactMarkdown from "react-markdown";
 import {
   Search,
   Settings,
@@ -11,36 +11,16 @@ import {
   Home,
   TerminalSquare
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
-export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey }) {
+export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey, docContent }) {
   const [openSidebar, setOpenSidebar] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [docContent, setDocContent] = useState("");  // 마크다운 설명
+  const [sidebarWidth, setSidebarWidth] = useState(320);
+  const resizerRef = useRef(null);
   const searchRef = useRef(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setShowSearch(false);
-        setOpenSidebar(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    if (selectedDocKey) {
-      fetch(`/descriptions/${selectedDocKey}.md`)
-        .then(res => res.ok ? res.text() : "설명이 아직 준비되지 않았습니다.")
-        .then(setDocContent)
-        .catch(() => setDocContent("설명을 불러오지 못했습니다."));
-    } else {
-      setDocContent("");
-    }
-  }, [selectedDocKey]);
 
   const sidebarContents = {
     ensm: [
@@ -66,6 +46,41 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
     ]
   };
 
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const newWidth = window.innerWidth - e.clientX;
+      setSidebarWidth(Math.min(Math.max(newWidth, 240), 600));
+    };
+
+    const stopResize = () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", stopResize);
+    };
+
+    const initResize = () => {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", stopResize);
+    };
+
+    const resizer = resizerRef.current;
+    if (resizer) resizer.addEventListener("mousedown", initResize);
+
+    return () => {
+      if (resizer) resizer.removeEventListener("mousedown", initResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSearch(false);
+        setOpenSidebar(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div style={{ height: "100vh", overflow: "hidden", backgroundColor: "#1e1f22", color: "white", fontFamily: "sans-serif" }}>
       {/* 상단바 */}
@@ -75,7 +90,7 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
 
       {/* 아이콘바 */}
       <div style={{ position: "fixed", top: "48px", left: 0, bottom: 0, width: "64px", backgroundColor: "#2b2d31", display: "flex", flexDirection: "column", alignItems: "center", padding: "16px 0", gap: "16px", borderRight: "1px solid #444", zIndex: 999 }}>
-        <button onClick={() => { navigate("/"); setOpenSidebar(null); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Home size={20} /></button>
+        <button onClick={() => { navigate("/DashBoard"); setOpenSidebar(null); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Home size={20} /></button>
         <button onClick={() => { setShowSearch(!showSearch); setOpenSidebar(null); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Search size={20} /></button>
         <button onClick={() => setOpenSidebar(openSidebar === "ensm" ? null : "ensm") } style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Settings size={20} /></button>
         <button onClick={() => setOpenSidebar(openSidebar === "network" ? null : "network") } style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Network size={20} /></button>
@@ -144,7 +159,7 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
             top: 48,
             bottom: 0,
             right: 0,
-            width: "320px",
+            width: `${sidebarWidth}px`,
             backgroundColor: "#282a36",
             color: "white",
             padding: "20px",
@@ -153,7 +168,35 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
             zIndex: 1300
           }}
         >
-          <div style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "1rem" }}>{selectedDocKey}</div>
+          <div
+            ref={resizerRef}
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: "6px",
+              cursor: "col-resize",
+              zIndex: 9999,
+              backgroundColor: "transparent"
+            }}
+          ></div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+            <div style={{ fontSize: "1rem", fontWeight: "bold" }}>{selectedDocKey}</div>
+            <button
+              onClick={() => setSelectedDocKey(null)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#fff",
+                fontSize: "1.2rem",
+                cursor: "pointer"
+              }}
+              title="닫기"
+            >
+              ❌
+            </button>
+          </div>
           <ReactMarkdown>{docContent}</ReactMarkdown>
         </div>
       )}
