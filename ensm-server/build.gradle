@@ -78,21 +78,21 @@ task installReact(type: Exec) {
 	group = BasePlugin.BUILD_GROUP
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 		commandLine "npm.cmd", "audit", "fix"
-		commandLine 'npm.cmd', 'install' }
-	else {
-		commandLine "npm", "audit", "fix" commandLine 'npm', 'install'
+		commandLine "npm.cmd", "install"
+	} else {
+		commandLine "/usr/local/bin/npm", "audit", "fix"
+		commandLine "/usr/local/bin/npm", "install"
 	}
 }
 
 task buildReact(type: Exec) {
-	dependsOn "installReact"
-	workingDir "$frontendDir"
-	inputs.dir "$frontendDir"
+	workingDir "$frontendDir"  // 프론트엔드 디렉토리 설정
 	group = BasePlugin.BUILD_GROUP
+
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-		commandLine "npm.cmd", "run-script", "build"
+		commandLine "npm.cmd", "run", "build"
 	} else {
-		commandLine "npm", "run-script", "build"
+		commandLine "/usr/local/bin/npm", "run", "build"  // 절대 경로 지정!
 	}
 }
 
