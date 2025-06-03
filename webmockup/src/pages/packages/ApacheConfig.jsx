@@ -101,7 +101,7 @@ const loadMarkdown = async (label) => {
     padding: 0,
     margin: 0,
     color: "#555",
-    fontSize: "1.1rem",
+    fontSize: "1.[1rem",
     cursor: "pointer"
   }}
 >

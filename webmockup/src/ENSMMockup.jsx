@@ -90,7 +90,7 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
 
       {/* 아이콘바 */}
       <div style={{ position: "fixed", top: "48px", left: 0, bottom: 0, width: "64px", backgroundColor: "#2b2d31", display: "flex", flexDirection: "column", alignItems: "center", padding: "16px 0", gap: "16px", borderRight: "1px solid #444", zIndex: 999 }}>
-        <button onClick={() => { navigate("/DashBoard"); setOpenSidebar(null); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Home size={20} /></button>
+        <button onClick={() => { navigate("/"); setOpenSidebar(null); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Home size={20} /></button>
         <button onClick={() => { setShowSearch(!showSearch); setOpenSidebar(null); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Search size={20} /></button>
         <button onClick={() => setOpenSidebar(openSidebar === "ensm" ? null : "ensm") } style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Settings size={20} /></button>
         <button onClick={() => setOpenSidebar(openSidebar === "network" ? null : "network") } style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Network size={20} /></button>
