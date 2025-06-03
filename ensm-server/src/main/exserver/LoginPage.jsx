@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
+import Swal from "sweetalert2";
 
 export default function LoginPage() {
   const [step, setStep] = useState(1);
@@ -15,10 +16,33 @@ export default function LoginPage() {
     "ensm@test.org"
   ];
 
-  const handleLogin = () => {
-    // 기본 로그인 검증 로직
-    setStep(2);
-  };
+const handleLogin = () => {
+  if (userId.trim() === "" || password.trim() === "") {
+    Swal.fire({
+      icon: 'error',
+      title: '로그인 실패',
+      text: '아이디 또는 비밀번호가 일치하지 않습니다',
+    });
+    return;
+  }
+
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
+
+  const isValid = users.some(
+    (user) => user.id === userId && user.pw === password
+  );
+
+  if (!isValid) {
+    Swal.fire({
+      icon: 'error',
+      title: '로그인 실패',
+      text: '아이디 또는 비밀번호가 일치하지 않습니다',
+    });
+    return;
+  }
+
+  setStep(2);
+};
 
   const goToDashboard = () => {
     navigate("/DashBoard");
