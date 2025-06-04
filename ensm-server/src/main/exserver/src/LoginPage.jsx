@@ -15,9 +15,35 @@ export default function LoginPage() {
     "ensm@test.org"
   ];
 
-  const handleLogin = () => {
-    // 기본 로그인 검증 로직
-    setStep(2);
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: userId,
+          password: password
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("로그인 실패");
+      }
+
+      const data = await response.json();
+      const token = data.token;
+
+      // JWT를 localStorage에 저장
+      localStorage.setItem("token", token);
+
+      // 이메일 인증 단계로 이동
+      setStep(2);
+    } catch (error) {
+      alert("아이디 또는 비밀번호가 잘못되었습니다.");
+      console.error(error);
+    }
   };
 
   const goToDashboard = () => {
