@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class JwtUtil {
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final long EXPIRATION = 1000 * 60 * 60; // 1 hour
+    private static final long EXPIRATION = 1000 * 60 * 1; // 1 hour
 
     public static String generateToken(String username) {
         return Jwts.builder()
@@ -20,20 +20,23 @@ public class JwtUtil {
     }
 
     public static String extractUsername(String token) {
-        try {
-            return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-        } catch (Exception e) {
-            return null;
-        }
+        return Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
     }
 
     public static boolean isTokenValid(String token, String username) {
-        String extractedUsername = extractUsername(token);
-        return extractedUsername != null && extractedUsername.equals(username);
+        try {
+            String extractedUsername = extractUsername(token);
+            return extractedUsername != null && extractedUsername.equals(username);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            System.out.println("Token expired");
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
