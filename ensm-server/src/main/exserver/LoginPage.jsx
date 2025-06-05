@@ -4,96 +4,66 @@ import "./LoginPage.css";
 import Swal from "sweetalert2";
 
 export default function LoginPage() {
-  const [step, setStep] = useState(1);
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedEmail, setSelectedEmail] = useState("minn0701@naver.com");
   const navigate = useNavigate();
 
-  const emailOptions = [
-    "minn0701@naver.com",
-    "admin@example.com",
-    "ensm@test.org"
-  ];
-
-const handleLogin = () => {
+const handleLogin = async () => {
   if (userId.trim() === "" || password.trim() === "") {
     Swal.fire({
       icon: 'error',
       title: '로그인 실패',
-      text: '아이디 또는 비밀번호가 일치하지 않습니다',
+      text: '아이디 또는 비밀번호를 입력해주세요',
     });
     return;
   }
 
-  const users = JSON.parse(localStorage.getItem("users") || "[]");
+  try {
+    const response = await fetch("/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: userId, password }),
+    });
 
-  const isValid = users.some(
-    (user) => user.id === userId && user.pw === password
-  );
+    if (!response.ok) {
+      throw new Error("로그인 실패");
+    }
 
-  if (!isValid) {
+    const data = await response.json();
+    localStorage.setItem("token", data.token);  // JWT 저장
+
+      // 로그인 성공 시 바로 대시보드로 이동
+      navigate("/DashBoard");
+  } catch (error) {
     Swal.fire({
       icon: 'error',
       title: '로그인 실패',
       text: '아이디 또는 비밀번호가 일치하지 않습니다',
     });
-    return;
   }
-
-  setStep(2);
 };
-
-  const goToDashboard = () => {
-    navigate("/DashBoard");
-  };
 
   return (
     <div className="login-container">
       <div className="login-box">
-        {step === 1 ? (
-          <>
-            <h2>🔐 ENSM 로그인</h2>
-            <input
-              type="text"
-              placeholder="아이디"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="비밀번호"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button onClick={handleLogin}>로그인</button>
-          </>
-        ) : (
-          <>
-            <h2>📧 이메일 인증</h2>
-            <label style={{ color: "white", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
-              이메일 주소 선택
-            </label>
-            <select
-              value={selectedEmail}
-              onChange={(e) => setSelectedEmail(e.target.value)}
-              style={{
-                padding: "8px",
-                marginBottom: "1rem",
-                backgroundColor: "#1e1f22",
-                color: "white",
-                border: "1px solid #555",
-                borderRadius: "4px"
-              }}
-            >
-              {emailOptions.map((email, idx) => (
-                <option key={idx} value={email}>{email}</option>
-              ))}
-            </select>
-            <button onClick={goToDashboard}>이메일 인증하기</button>
-            <button className="skip" onClick={goToDashboard}>건너뛰기</button>
-          </>
-        )}
+        <>
+          <h2>🔐 ENSM 로그인</h2>
+          <input
+            type="text"
+            placeholder="아이디"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="비밀번호"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button onClick={handleLogin}>로그인</button>
+        </>
       </div>
     </div>
   );

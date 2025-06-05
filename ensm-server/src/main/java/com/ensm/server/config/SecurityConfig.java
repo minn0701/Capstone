@@ -32,6 +32,9 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtAuthenticationFilter(userStore), UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(e -> e
+                .authenticationEntryPoint((request, response, authException) -> response.sendRedirect("/"))
+            )
             .httpBasic(b -> b.disable())
             .formLogin(f -> f.disable());
         return http.build();

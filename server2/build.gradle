@@ -69,7 +69,7 @@ task installReact(type: Exec) {
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 		commandLine 'cmd', '/c', 'npm.cmd', 'install'
 	} else {
-		commandLine 'npm', 'install'
+		commandLine '/usr/local/bin/npm', 'install'
 	}
 }
 
@@ -81,7 +81,7 @@ task buildReact(type: Exec) {
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 		commandLine 'cmd', '/c', 'npm.cmd', 'run', 'build'
 	} else {
-		commandLine 'npm', 'run', 'build'
+		commandLine '/usr/local/bin/npm', 'run', 'build'
 	}
 }
 
