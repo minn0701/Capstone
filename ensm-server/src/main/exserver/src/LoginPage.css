@@ -48,3 +48,25 @@
   background-color: #aaa;
   color: black;
 }
+
+
+
+.login-links {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+
+.login-links a {
+  color: #bbb;
+  text-decoration: none;
+  margin: 0 6px;
+  display: inline-block;
+}
+
+.login-links a:hover {
+  color: #00c73c; /* 연두색 강조 */
+  text-decoration: underline;
+}

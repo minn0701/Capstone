@@ -35,10 +35,8 @@ export default function LoginPage() {
       const data = await response.json();
       const token = data.token;
 
-      // JWT를 localStorage에 저장
       localStorage.setItem("token", token);
 
-      // authFetch: 인증 토큰을 자동으로 포함하는 fetch 래퍼 (401/403 처리)
       window.authFetch = async (url, options = {}) => {
         const token = localStorage.getItem("token");
         const headers = {
@@ -58,8 +56,8 @@ export default function LoginPage() {
         return response;
       };
 
-      // 이메일 인증 단계로 이동
-      setStep(2);
+      // ✅ step을 2로 바꾸는 코드 주석처리 (테스트용)
+      // setStep(2);
     } catch (error) {
       alert("아이디 또는 비밀번호가 잘못되었습니다.");
       console.error(error);
@@ -89,6 +87,14 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <button onClick={handleLogin}>로그인</button>
+
+            <div className="login-links">
+              <a href="/find-id">아이디 찾기</a>
+              <span> | </span>
+              <a href="/find-password">비밀번호 찾기</a>
+              <span> | </span>
+              <a href="/signup">회원가입</a>
+            </div>
           </>
         ) : (
           <>
