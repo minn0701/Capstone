@@ -90,13 +90,10 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <button onClick={handleLogin}>로그인</button>
-                        <div className="login-links">
-                              <a href="/find-id">아이디 찾기</a>
-                              <span> | </span>
-                              <a href="/find-password">비밀번호 찾기</a>
-                              <span> | </span>
-                              <a href="/signup">회원가입</a>
-                        </div>
+
+            <div className="login-links">
+              <a href="/find-account">계정을 잃어버리셨나요?</a>
+            </div>
 
           </>
         ) : (

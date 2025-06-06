@@ -33,7 +33,7 @@ export default function FindAccountPage() {
       Swal.fire({
         icon: 'success',
         title: '아이디 찾기 성공',
-        text: `등록된 아이디는: ${user.id}`,
+        text: '등록된 아이디는: ${user.id}',
       });
     }
 
