@@ -68,7 +68,7 @@ export default function LoginPage() {
   };
 
   const goToDashboard = () => {
-    navigate("/DashBoard");
+    navigate("/main/");
   };
 
   return (
