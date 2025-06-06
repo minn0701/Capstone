@@ -43,7 +43,7 @@ export default function FindAccountPage() {
   return (
     <div className="find-account-container">
       <div className="find-account-box">
-        <h2>{isPassword ? "🔑 비밀번호 찾기" : "🔎 아이디 찾기"}</h2>
+        <h2>{isPassword ? "비밀번호 찾기" : "아이디 찾기"}</h2>
         <input
           type="email"
           placeholder="이메일 또는 아이디"
