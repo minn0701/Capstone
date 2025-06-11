@@ -204,8 +204,8 @@ return (
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
         <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📦로컬 네임 서버 설정(/etc/hosts)</h3>
 
-        {renderSetting("name server", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
-        {renderSetting("IP address", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
+        {renderSetting("name server_hosts", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
+        {renderSetting("IP address_hosts", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
 
 
       </div>  
@@ -213,8 +213,8 @@ return (
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
         <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>👤 외부 네임 서버 설정(/etc/resolv.conf)</h3>
        
-        {renderSetting("name server", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
-        {renderSetting("IP address", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
+        {renderSetting("name server_resolv.conf", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
+        {renderSetting("IP address_resolv.conf", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
       </div>
 
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
