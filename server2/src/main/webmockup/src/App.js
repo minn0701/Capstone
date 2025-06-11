@@ -14,7 +14,7 @@ import NetworkLog from "./pages/network/NetworkLog";
 import PortDaemonStatus from "./pages/network/PortDaemonStatus";
 import SSHAutomation from "./pages/tools/SSHAutomation";
 import WebFTP from "./pages/tools/WebFTP";
-import Dashboard from "./pages/Dashboard"; // 홈 대체할 컴포넌트
+import Dashboard from "./pages/Dashboard1"; // 홈 대체할 컴포넌트
 
 
 
