@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -22,6 +23,76 @@ export default function ENSMMockup({ children }) {
     console.log("검색어:", searchQuery);
     // 추후 실제 검색 결과로 연결 가능
   };
+
+// 상단: 명령어 맵 정의
+  const commandMap = {
+    ServerAdmin: "/packages/apache",
+    ServerName_global: "/packages/apache",
+    DocumentRoot: "/packages/apache",
+    ServerTokens: "/packages/apache",
+    HostnameLookups: "/packages/apache",
+    Timeout: "/packages/apache",
+    LogLevel: "/packages/apache",
+    ErrorLog: "/packages/apache",
+    CustomLog: "/packages/apache",
+    Require: "/packages/apache",
+    AllowOverride: "/packages/apache",
+    Indexes: "/packages/apache",
+    FollowSymLinks: "/packages/apache",
+    SymLinksIfOwnerMatch: "/packages/apache",
+    ExecCGI: "/packages/apache",
+    env_module: "/packages/apache",
+    mime_module: "/packages/apache",
+    alias_module: "/packages/apache",
+    dir_module: "/packages/apache",
+    status_module: "/packages/apache",
+    autoindex_module: "/packages/apache",
+    include_module: "/packages/apache",
+    negotiation_module: "/packages/apache",
+    auth_basic_module: "/packages/apache",
+    authn_file_module: "/packages/apache",
+    authz_host_module: "/packages/apache",
+    authz_user_module: "/packages/apache",
+    UserDir: "/packages/apache",
+    IndexOptions: "/packages/apache",
+    AddDescription: "/packages/apache",
+    TypesConfig: "/packages/apache",
+    DefaultType: "/packages/apache",
+    IncludeOptional: "/packages/apache",
+    VirtualHost: "/packages/apache",
+    ServerName_vhost: "/packages/apache",
+    "listen-on port 53": "/packages/bind",
+    "listen-on-v6 port 53": "/packages/bind",
+    "forward": "/packages/bind",
+    "forwarders": "/packages/bind",
+    "allow-query": "/packages/bind",
+    "allow-transfer": "/packages/bind",
+    "acl": "/packages/bind",
+    "zone'DomainName'IN": "/packages/bind",
+    "type": "/packages/bind",
+    "file": "/packages/bind",
+    "$TTL": "/packages/bind",
+    "사이트_이름": "/packages/bind",
+    "DNS_server_address": "/packages/bind",
+    "DNS_administrator_mail_address": "/packages/bind",
+    "serial": "/packages/bind",
+    "refresh": "/packages/bind",
+    "retry": "/packages/bind",
+    "expire": "/packages/bind",
+    "minimum TTL": "/packages/bind",
+    "name_server_hosts": "/packages/bind",
+    "IP_address_hosts": "/packages/bind",
+    "name_server_resolv_conf": "/packages/bind",
+    "IP_address_resolv_conf": "/packages/bind",
+    "도메인": "/packages/bind",
+    "방향": "/packages/bind",
+    "type_master": "/packages/bind",
+    "file_zone_파일_이름": "/packages/bind",
+    "allow-update": "/packages/bind"
+    };
+
+
+
 
   const sidebarContents = {
     ensm: [
@@ -93,7 +164,17 @@ export default function ENSMMockup({ children }) {
                 animate={{ x: 64 }}
                 exit={{ x: -260 }}
                 transition={{ duration: 0.2 }}
-                style={{ position: "absolute", top: 48, bottom: 0, left: 0, width: "240px", backgroundColor: "#313338", borderRight: "1px solid #444", padding: "16px", zIndex: 100 }}
+                style={{
+                  position: "absolute",
+                  top: 48,
+                  bottom: 0,
+                  left: 0,
+                  width: "240px",
+                  backgroundColor: "#313338",
+                  borderRight: "1px solid #444",
+                  padding: "16px",
+                  zIndex: 100
+                }}
             >
               {!showSearch ? (
                   <>
@@ -130,34 +211,57 @@ export default function ENSMMockup({ children }) {
                       <button
                           onClick={handleSearch}
                           style={{
-                            padding: "4px 10px",
+                            padding: "2px 6px",
                             backgroundColor: "#444",
                             border: "none",
                             borderRadius: "4px",
                             color: "white",
                             cursor: "pointer",
-                            fontSize: "0.85rem"
+                            fontSize: "0.70rem"
                           }}
                       >
                         검색
                       </button>
                     </div>
+
+                    {/* 사이드바 label 검색 */}
                     {searchQuery &&
                         Object.entries(sidebarContents).map(([key, items], idx) => (
-                            <div key={idx}>
+                            <div key={`label-${idx}`}>
                               {items
                                   .filter((item) => item.label.includes(searchQuery))
                                   .map((item, i) => (
-                                      <div key={i} style={{ fontSize: "0.85rem", padding: "4px 0" }}>
+                                      <div key={`label-item-${i}`} style={{ fontSize: "0.85rem", padding: "4px 0" }}>
                                         {item.label}
                                       </div>
                                   ))}
                             </div>
                         ))}
+
+                    {/* 명령어 검색 결과 */}
+                    {searchQuery &&
+                        Object.entries(commandMap)
+                            .filter(([cmd]) => cmd.toLowerCase().includes(searchQuery.toLowerCase()))
+                            .map(([cmd, path], i) => (
+                                <div
+                                    key={`cmd-${i}`}
+                                    onClick={() => navigate(path)}
+                                    style={{
+                                      fontSize: "0.85rem",
+                                      padding: "4px 0",
+                                      cursor: "pointer",
+                                      color: "#4ade80"
+                                    }}
+                                >
+                                  {cmd} (→ {path})
+                                </div>
+                            ))}
                   </>
               )}
             </motion.div>
         )}
+
+
       </div>
   );
 }
