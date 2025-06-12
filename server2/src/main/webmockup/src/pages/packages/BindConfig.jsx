@@ -191,7 +191,7 @@ return (
         <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📁 zone 파일</h3>
         {renderSetting("$TTL", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("사이트 이름", <input type="text" placeholder="linux.com" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
-        {renderSetting("DNS 서버 주소", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
+        {renderSetting("DNS server adderess", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("DNS 관리자 메일 주소", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("serial", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("refresh", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
