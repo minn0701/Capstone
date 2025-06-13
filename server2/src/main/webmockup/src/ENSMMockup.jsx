@@ -140,7 +140,7 @@ export default function ENSMMockup({ children }) {
             <button onClick={() => setOpenSidebar(openSidebar === "tools" ? null : "tools") } style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><TerminalSquare size={20} /></button>
           </div>
 
-          <div style={{ flex: 1, position: "relative", padding: "24px", overflowY: "auto" }}>
+          <div style={{ flex: 1, position: "relative", padding: "24px", overflowY: "auto",  backgroundColor: "#1e1f22" }}>
             <div style={{ backgroundColor: "#2b2d31", minHeight: "78vh", border: "1px solid #444", borderRadius: "8px", padding: "16px" }}>
               {children}
             </div>
@@ -163,7 +163,9 @@ export default function ENSMMockup({ children }) {
                   backgroundColor: "#313338",
                   borderRight: "1px solid #444",
                   padding: "16px",
-                  zIndex: 100
+                  zIndex: 100,
+                  overflowY: "auto",
+                  maxHeight: "calc(100vh - 48px)"
                 }}
             >
               {!showSearch ? (
