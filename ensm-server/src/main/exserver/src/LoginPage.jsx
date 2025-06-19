@@ -52,7 +52,8 @@ export default function LoginPage() {
       };
 
       // 로그인 성공 시 메인 페이지로 이동
-      navigate("/main");
+      // ✅ 올바른 리다이렉션 방식
+      window.location.href = 'https://ensm.duckdns.org:55555/main';
 
 
     } catch (error) {
