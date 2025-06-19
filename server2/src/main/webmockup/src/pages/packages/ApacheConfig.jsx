@@ -101,7 +101,7 @@ const loadMarkdown = async (label) => {
     padding: 0,
     margin: 0,
     color: "#555",
-    fontSize: "1.[1rem",
+    fontSize: "1.1rem",
     cursor: "pointer"
   }}
 >
@@ -155,7 +155,7 @@ return (
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
         <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📂 Server Settings</h3>
         {renderSetting("ServerAdmin", <input type="email" placeholder="webmaster@example.com" style={inputStyle} />, "에러가 발생할 경우 이메일로 관리자에게 전송됩니다.", "서버 관리자 이메일 주소")}
-        {renderSetting("ServerName", <input type="text" placeholder="localhost" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
+        {renderSetting("ServerName_global", <input type="text" placeholder="localhost" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("DocumentRoot", <input type="text" placeholder="/var/www/html" style={inputStyle} />, "웹 문서의 기본 경로를 지정합니다.", "웹 문서 루트 경로")}
         {renderSetting("ServerTokens", <select style={inputStyle} defaultValue="Prod">
           <option value="Full">Full</option>
@@ -243,7 +243,7 @@ return (
 <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
   <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>🌐 VirtualHost</h3>
   {renderSetting("<VirtualHost *:80>", <input type="text" placeholder="* or 192.168.0.1" style={inputStyle} />, "가상 호스트가 수신할 IP:포트 조합입니다.", "수신 인터페이스")}
-  {renderSetting("ServerName", <input type="text" placeholder="www.example.com" style={inputStyle} />, "이 가상 호스트와 연결된 도메인 이름입니다.", "서버 도메인명")}
+  {renderSetting("ServerName_vhost", <input type="text" placeholder="www.example.com" style={inputStyle} />, "이 가상 호스트와 연결된 도메인 이름입니다.", "서버 도메인명")}
   {renderSetting("DocumentRoot", <input type="text" placeholder="/var/www/example" style={inputStyle} />, "이 가상 호스트의 문서 루트 디렉토리입니다.", "문서 루트 경로")}
   {renderSetting("ErrorLog", <input type="text" placeholder="logs/example_error.log" style={inputStyle} />, "가상 호스트의 에러 로그 경로입니다.", "에러 로그 경로")}
   {renderSetting("CustomLog", <input type="text" placeholder="logs/example_access.log common" style={inputStyle} />, "가상 호스트의 접속 로그 경로입니다.", "접속 로그 경로")}
