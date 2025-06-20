@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 import { HelpCircle } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 
+
 export default function ApacheConfig() {
   const [showHint, setShowHint] = useState(null);
   const [toggles, setToggles] = useState({});
@@ -19,10 +20,12 @@ const loadMarkdown = async (label) => {
     const text = await response.text();
     setDocContent(text);
     setSelectedDocKey(label);
+    setShowHint(null);
   } catch (err) {
     console.error(`❌ 설명서 로드 실패: ${label}`, err);
     setDocContent("설명을 불러오는 데 실패했습니다.");
     setSelectedDocKey(label);
+    setShowHint(null);
   }
 };
 
@@ -216,7 +219,7 @@ return (
         {renderSetting("LoadModule authn_file_module", renderToggle("authn_file_module"), "파일 기반 사용자 인증을 지원합니다.", "mod_authn_file 로드 여부")}
         {renderSetting("LoadModule authz_host_module", renderToggle("authz_host_module"), "호스트 기반 접근 제어 기능을 제공합니다.", "mod_authz_host 로드 여부")}
         {renderSetting("LoadModule authz_user_module", renderToggle("authz_user_module"), "사용자 기반 접근 제어를 지원합니다.", "mod_authz_user 로드 여부")}
-      </div>  
+      </div>
 
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
   <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>👤 UserDir</h3>

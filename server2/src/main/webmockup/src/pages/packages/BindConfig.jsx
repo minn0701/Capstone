@@ -1,4 +1,4 @@
-// ApacheConfig.jsx 수정본 - 힌트창 내부에 📄 문서버튼과 ❌ 닫기버튼 배치
+// BindConfig.jsx 수정본 - 힌트창 내부에 📄 문서버튼과 ❌ 닫기버튼 배치
 import React, { useState, useRef } from "react";
 import { HelpCircle } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
@@ -19,6 +19,7 @@ const loadMarkdown = async (label) => {
     const text = await response.text();
     setDocContent(text);
     setSelectedDocKey(label);
+    setShowHint(null)
   } catch (err) {
     console.error(`❌ 설명서 로드 실패: ${label}`, err);
     setDocContent("설명을 불러오는 데 실패했습니다.");
@@ -159,7 +160,7 @@ return (
 
 
         <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📂 /etc/named.conf파일</h3>
-        {renderSetting("listen-on port 53", <input type="email" placeholder="webmaster@example.com" style={inputStyle} />, "에러가 발생할 경우 이메일로 관리자에게 전송됩니다.", "서버 관리자 이메일 주소")} 
+        {renderSetting("listen-on port 53", <input type="email" placeholder="webmaster@example.com" style={inputStyle} />, "에러가 발생할 경우 이메일로 관리자에게 전송됩니다.", "서버 관리자 이메일 주소")}
         {renderSetting("listen-on-v6 port 53", <input type="text" placeholder="localhost" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("forward", <select style={inputStyle} defaultValue="Prod">
           <option value="only">only</option>
@@ -175,7 +176,7 @@ return (
 
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
         <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📝 zone 구문</h3>
-        
+
         {renderSetting("zone'도메인명'IN", <input type="text" placeholder="192.168.0.1" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("type", <select style={inputStyle} defaultValue="Prod">
           <option value="master">master</option>
@@ -197,7 +198,7 @@ return (
         {renderSetting("refresh", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("retry", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("expire", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
-        {renderSetting("minimum TTL", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}  
+        {renderSetting("minimum TTL", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
 
       </div>
 
@@ -208,18 +209,18 @@ return (
         {renderSetting("IP address_hosts", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
 
 
-      </div>  
+      </div>
 
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
         <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>👤 외부 네임 서버 설정(/etc/resolv.conf)</h3>
-       
+
         {renderSetting("name server_resolv.conf", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("IP address_resolv.conf", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
       </div>
 
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
         <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📄 네임 서버 정의 파일일</h3>
-        
+
         {renderSetting("도메인", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("방향", renderToggle("authz_user_module"), "정방향 / 역방향", "mod_authz_user 로드 여부")}
         {renderSetting("type-master", <select style={inputStyle} defaultValue="Prod">

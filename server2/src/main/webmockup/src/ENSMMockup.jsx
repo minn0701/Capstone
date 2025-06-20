@@ -11,6 +11,7 @@ import {
   TerminalSquare
 } from "lucide-react";
 
+
 export default function ENSMMockup({ children }) {
   const [openSidebar, setOpenSidebar] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
@@ -125,12 +126,35 @@ export default function ENSMMockup({ children }) {
 
   return (
       <div style={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "#1e1f22", color: "white", fontFamily: "sans-serif", position: "relative" }}>
-        <div style={{ height: "48px", backgroundColor: "#2b2d31", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #444" }}>
+        <div style={{ height: "48px", backgroundColor: "#2b2d31", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #444", position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000 }}>
           <h1 style={{ fontWeight: "bold", fontSize: "1rem" }}>ENSM</h1>
+          <button
+              onClick={() => console.log("💾 저장됨")}
+              style={{
+                backgroundColor: "#6b7280",
+                color: "white",
+                border: "none",
+                padding: "6px 12px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "0.85rem"
+              }}
+          >
+            저장
+          </button>
         </div>
 
         <div style={{ display: "flex", flex: 1 }}>
-          <div style={{ width: "64px", backgroundColor: "#2b2d31", display: "flex", flexDirection: "column", alignItems: "center", padding: "16px 0", gap: "16px", borderRight: "1px solid #444" }}>
+          <div style={{ width: "64px",
+                        backgroundColor: "#2b2d31",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        padding: "16px 0",
+                        paddingTop: "64px",
+                        gap: "16px",
+                        borderRight: "1px solid #444" }}>
+
             <button onClick={() => { navigate("/"); setOpenSidebar(null); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Home size={20} /></button>
             <button onClick={() => { setShowSearch(!showSearch); setOpenSidebar(null); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Search size={20} /></button>
             <button onClick={() => setOpenSidebar(openSidebar === "ensm" ? null : "ensm") } style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><Settings size={20} /></button>
@@ -140,8 +164,24 @@ export default function ENSMMockup({ children }) {
             <button onClick={() => setOpenSidebar(openSidebar === "tools" ? null : "tools") } style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}><TerminalSquare size={20} /></button>
           </div>
 
-          <div style={{ flex: 1, position: "relative", padding: "24px", overflowY: "auto",  backgroundColor: "#1e1f22" }}>
-            <div style={{ backgroundColor: "#2b2d31", minHeight: "78vh", border: "1px solid #444", borderRadius: "8px", padding: "16px" }}>
+          <div style={{
+            marginLeft: "36px",
+            marginTop: "48px",
+            padding: "24px 24px 24px 0px",
+            overflowY: "auto",
+            height: "calc(100vh - 48px)",
+            backgroundColor: "#1e1f22",
+            width: "100%",
+            boxSizing: "border-box"
+          }}>
+
+          <div style={{ backgroundColor: "#2b2d31",
+                          minHeight: "78vh",
+                          border: "1px solid #444",
+                          borderRadius: "8px",
+                          padding: "16px",
+                          }}>
+
               {children}
             </div>
           </div>
