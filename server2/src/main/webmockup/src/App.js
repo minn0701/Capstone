@@ -67,7 +67,7 @@ function LayoutWrapper() {
                     </div>
 
                     <div className="doc-sidebar-content">
-                     <ReactMarkdown>{docContent}</ReactMarkdown>
+                        <ReactMarkdown>{docContent}</ReactMarkdown>
                     </div>
 
                 </div>

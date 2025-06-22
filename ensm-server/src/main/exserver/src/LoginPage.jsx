@@ -1,12 +1,10 @@
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 
 export default function LoginPage() {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
@@ -26,34 +24,10 @@ export default function LoginPage() {
       }
 
       const data = await response.json();
-      const token = data.token;
-
-      // JWT를 localStorage에 저장
-      localStorage.setItem("token", token);
-
-      // authFetch: 인증 토큰을 자동으로 포함하는 fetch 래퍼 (401/403 처리)
-      window.authFetch = async (url, options = {}) => {
-        const token = localStorage.getItem("token");
-        const headers = {
-          ...options.headers,
-          Authorization:`Bearer ${token}`,
-        };
-
-        const response = await fetch(url, { ...options, headers });
-
-        if (response.status === 401 || response.status === 403) {
-          alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
-          localStorage.removeItem("token");
-          window.location.href = "/";
-          return;
-        }
-
-        return response;
-      };
-
-      // 로그인 성공 시 메인 페이지로 이동
-      // ✅ 올바른 리다이렉션 방식
-      window.location.href = 'https://ensm.duckdns.org:55555/main';
+      if (data.message === "로그인 성공") {
+        window.location.href = 'https://ensm.duckdns.org:55555/main';
+        return;
+      }
 
 
     } catch (error) {
