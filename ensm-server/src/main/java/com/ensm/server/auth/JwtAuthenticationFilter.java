@@ -45,6 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    // Set cookie after authentication
+                    jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("token", token);
+                    cookie.setHttpOnly(true);
+                    cookie.setSecure(false); // Set to true in production
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
                 }
             });
         }
