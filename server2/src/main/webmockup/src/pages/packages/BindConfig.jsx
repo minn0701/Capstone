@@ -63,10 +63,10 @@ const loadMarkdown = async (label) => {
   <div
     style={{
       position: "absolute",
-      left: hintRefs.current[label]?.offsetLeft ?? 0,
-      top: (hintRefs.current[label]?.offsetTop ?? 0) + 24,
-      backgroundColor: "#fff",
-      color: "black",
+      left:"0px",
+      top: "-90px",
+        backgroundColor: "#f1f1f1",
+        color: "black",
       padding: "10px 12px",
       borderRadius: "8px",
       boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
@@ -151,7 +151,7 @@ const loadMarkdown = async (label) => {
 return (
     <div style={{ padding: "1rem", color: "white" }}>
       <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1.5rem" }}>
-        BIND DNS 서버 설정 (데모 UI)
+        BIND DNS 서버 설정
       </h2>
 
 

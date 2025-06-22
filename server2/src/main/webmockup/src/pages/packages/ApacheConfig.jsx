@@ -19,6 +19,7 @@ const loadMarkdown = async (label) => {
     const response = await fetch(`/descriptions/${label}.md`);
     const text = await response.text();
     setDocContent(text);
+    console.log("[✅ 불러온 마크다운 내용]", text);
     setSelectedDocKey(label);
     setShowHint(null);
   } catch (err) {
@@ -30,7 +31,7 @@ const loadMarkdown = async (label) => {
 };
 
   const renderSetting = (label, input, hint, description) => (
-    <div style={{ marginBottom: "1.5rem", position: "relative", zIndex: 0 }}>
+    <div style={{ marginBottom: "1.5rem", position: "relative", zIndex: 1000}}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ width: "40%", position: "relative" }}>
           <label style={{ fontWeight: "bold", display: "flex", alignItems: "center" }}>
@@ -65,16 +66,16 @@ const loadMarkdown = async (label) => {
   <div
     style={{
       position: "absolute",
-      left: hintRefs.current[label]?.offsetLeft ?? 0,
-      top: (hintRefs.current[label]?.offsetTop ?? 0) + 24,
+      left: "0px",
+      top:"-90px",
       backgroundColor: "#fff",
       color: "black",
       padding: "10px 12px",
       borderRadius: "8px",
-      boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+      boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
       minWidth: "240px",
-      zIndex: 9999
-    }}
+      zIndex: 100001
+  }}
   >
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
       <strong>{label}</strong>
@@ -152,7 +153,7 @@ const loadMarkdown = async (label) => {
 return (
     <div style={{ padding: "1rem", color: "white" }}>
       <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1.5rem" }}>
-        Apache httpd.conf 설정 (데모 UI)
+        Apache httpd.conf 설정
       </h2>
 
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
@@ -206,7 +207,7 @@ return (
       </div>
 
       <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📦 Modules (계속)</h3>
+        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📦 Modules </h3>
         {renderSetting("LoadModule env_module", renderToggle("env_module"), "환경변수 설정을 가능하게 하는 모듈입니다.", "mod_env 로드 여부")}
         {renderSetting("LoadModule mime_module", renderToggle("mime_module"), "MIME 타입 처리를 위한 모듈입니다.", "mod_mime 로드 여부")}
         {renderSetting("LoadModule alias_module", renderToggle("alias_module"), "URL을 실제 경로로 매핑합니다.", "mod_alias 로드 여부")}

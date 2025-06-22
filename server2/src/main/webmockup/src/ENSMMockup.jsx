@@ -126,7 +126,7 @@ export default function ENSMMockup({ children }) {
 
   return (
       <div style={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "#1e1f22", color: "white", fontFamily: "sans-serif", position: "relative" }}>
-        <div style={{ height: "48px", backgroundColor: "#2b2d31", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #444", position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000 }}>
+        <div style={{ height: "48px", backgroundColor: "#2b2d31", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #444", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 }}>
           <h1 style={{ fontWeight: "bold", fontSize: "1rem" }}>ENSM</h1>
           <button
               onClick={() => console.log("💾 저장됨")}
@@ -203,7 +203,7 @@ export default function ENSMMockup({ children }) {
                   backgroundColor: "#313338",
                   borderRight: "1px solid #444",
                   padding: "16px",
-                  zIndex: 100,
+                  zIndex: 9999,
                   overflowY: "auto",
                   maxHeight: "calc(100vh - 48px)"
                 }}

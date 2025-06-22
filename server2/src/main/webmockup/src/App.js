@@ -37,7 +37,16 @@ function LayoutWrapper() {
 
             {selectedDocKey && (
                 <div className="doc-sidebar">
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex",
+                                    justifyContent: "space-between",
+                                    paddingTop: "32px",
+                                    paddingRight: "16px",
+                                    paddingBottom: "12px",
+                                    paddingLeft: "16px",
+                                    alignItems: "flex-start",
+
+                                    }}>
+
                         <h3 className="doc-sidebar-title">📄 {selectedDocKey} 설명서</h3>
                         <button
                             onClick={() => {
@@ -56,6 +65,7 @@ function LayoutWrapper() {
                             ❌
                         </button>
                     </div>
+
                     <div className="doc-sidebar-content">
                      <ReactMarkdown>{docContent}</ReactMarkdown>
                     </div>
