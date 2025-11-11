@@ -1,58 +1,88 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+
 
 export default function Dashboard() {
-  const [kibanaBaseUrl, setKibanaBaseUrl] = useState("/kibana");
+  // 공통 설정
+  const host = "http://main.minn.my:3000";          // Grafana 외부 주소
+  const uid  = "sysmon-gauges";                     // 대시보드 UID
+  const slug = "system-monitor-gauge-2b-logs";      // 슬러그(Share → 링크에서 확인)
+  const orgId = 1;                                  // 기본 1
 
-  useEffect(() => {
-    // 시스템 설정에서 Kibana URL 로드
-    fetch("/main/api/system-config")
-      .then(res => res.json())
-      .then(data => {
-        if (data.kibanaBaseUrl) {
-          setKibanaBaseUrl(data.kibanaBaseUrl);
-        }
-      })
-      .catch(err => {
-        console.error("Kibana URL 로드 실패:", err);
-      });
-  }, []);
+  // 패널 ID (Grafana에서 각 패널 … → Inspect → Panel JSON 또는 Share panel 링크로 확인)
+  const PANEL_CPU    = 1;  // CPU 게이지
+  const PANEL_MEM    = 2;  // 메모리 게이지
+  const PANEL_DISK   = 3;  // 디스크 게이지
+  const PANEL_LOGS   = 4;  // journald 로그 패널 (Loki)
+
+  // 공통 쿼리 파라미터 (원하면 from/to를 now-6h~now로 통일)
+  const common = `orgId=${orgId}&refresh=10s&theme=dark`;
+
+  // 수동 임베드(d-solo) URL들
+  const urlCPU  = `${host}/d-solo/${uid}/${slug}?${common}&panelId=${PANEL_CPU}`;
+  const urlMEM  = `${host}/d-solo/${uid}/${slug}?${common}&panelId=${PANEL_MEM}`;
+  const urlDISK = `${host}/d-solo/${uid}/${slug}?${common}&panelId=${PANEL_DISK}`;
+  const urlLOGS = `${host}/d-solo/${uid}/${slug}?${common}&panelId=${PANEL_LOGS}`;
+
+  const card = {
+    backgroundColor: "#1e1e1e",
+    border: "1px solid #333",
+    borderRadius: "12px",
+    boxShadow: "0 0 16px rgba(0,0,0,0.45)",
+  };
 
   return (
-    <div style={{ padding: "2rem", backgroundColor: "#1e1e1e", minHeight: "100vh", color: "white" }}>
-      <h2 style={{ fontSize: "1.5rem", marginBottom: "1.5rem" }}>🛡️ ENSM 시스템 대시보드</h2>
+    <div style={{ padding: "24px", background: "#0e0e0e", minHeight: "100vh", color: "#fff" }}>
+      <h2 style={{ fontSize: 24, marginBottom: 16, fontWeight: 700 }}>🧠 시스템 개요 + 로그 뷰어</h2>
 
-      {/* 🌐 호스트 오버뷰 */}
-      <div style={{ 
-        backgroundColor: "#1e1e1e",  // iframe wrapper 색상
-        padding: "0.5rem",
-        borderRadius: "8px",
-        border: "1px solid #444",
-        marginBottom: "2rem",
-        boxShadow: "0 0 10px rgba(0,0,0,0.5)"
-      }}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "0.75rem" }}>🌐 호스트 오버뷰</h3>
-        <iframe
-          src={`${kibanaBaseUrl}/app/dashboards#/view/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs?embed=true&_g=(refreshInterval:(pause:!f,value:60000),time:(from:now-15m,to:now))&show-time-filter=false`}
-          style={{ width: "100%", height: "600px", border: "1px solid #444", borderRadius: "4px", backgroundColor: "#1e1e1e" }}
-          title="호스트 오버뷰"
-        ></iframe>
-      </div>
+      {/* 상단: 시스템 개요 (게이지 3개) */}
+      <section style={{ marginBottom: 24 }}>
+        <h3 style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}>📈 시스템 개요</h3>
+        <div
+          style={{
+            display: "grid",
+            gap: 12,
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          }}
+        >
+          <div style={{ ...card, padding: 8 }}>
+            <iframe
+              src={urlCPU}
+              title="CPU Usage (%)"
+              style={{ width: "100%", height: 300, border: 0, borderRadius: 10, background: "#1e1e1e" }}
+              loading="lazy"
+            />
+          </div>
+          <div style={{ ...card, padding: 8 }}>
+            <iframe
+              src={urlMEM}
+              title="Memory Usage (%)"
+              style={{ width: "100%", height: 300, border: 0, borderRadius: 10, background: "#1e1e1e" }}
+              loading="lazy"
+            />
+          </div>
+          <div style={{ ...card, padding: 8 }}>
+            <iframe
+              src={urlDISK}
+              title="Disk Usage (%)"
+              style={{ width: "100%", height: 300, border: 0, borderRadius: 10, background: "#1e1e1e" }}
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </section>
 
-      {/* 📋 실행 중인 주요 프로세스 */}
-      <div style={{ 
-        backgroundColor: "#1e1e1e",
-        padding: "0.5rem",
-        borderRadius: "8px",
-        border: "1px solid #444",
-        boxShadow: "0 0 10px rgba(0,0,0,0.5)"
-      }}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "0.75rem" }}>📋 실행 중인 주요 프로세스</h3>
-        <iframe
-          src={`${kibanaBaseUrl}/app/dashboards#/view/68a562fd-dccd-4f29-9ab0-6e84586e33ec?embed=true&_g=(refreshInterval:(pause:!f,value:60000),time:(from:now-15m,to:now))&show-time-filter=false`}
-          style={{ width: "100%", height: "600px", border: "1px solid #444", borderRadius: "4px", backgroundColor: "#1e1e1e" }}
-          title="실행 중인 주요 프로세스"
-        ></iframe>
-      </div>
+      {/* 하단: 로그 뷰어 */}
+      <section>
+        <h3 style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}>📝 로그 뷰어 (Loki)</h3>
+        <div style={{ ...card, padding: 8 }}>
+          <iframe
+            src={urlLOGS}
+            title="System Logs"
+            style={{ width: "100%", height: 520, border: 0, borderRadius: 10, background: "#1e1e1e" }}
+            loading="lazy"
+          />
+        </div>
+      </section>
     </div>
   );
 }
