@@ -52,6 +52,12 @@ public class SystemConfigController {
         if (newConfig.getApacheSshPassword() != null) {
             currentConfig.setApacheSshPassword(newConfig.getApacheSshPassword());
         }
+        if (newConfig.getEnsmScriptsBasePath() != null) {
+            currentConfig.setEnsmScriptsBasePath(newConfig.getEnsmScriptsBasePath());
+        }
+        if (newConfig.getBindScriptPath() != null) {
+            currentConfig.setBindScriptPath(newConfig.getBindScriptPath());
+        }
         if (newConfig.getSystemName() != null) {
             currentConfig.setSystemName(newConfig.getSystemName());
         }

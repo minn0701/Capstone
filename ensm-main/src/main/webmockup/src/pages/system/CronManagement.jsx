@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import SettingItem from "../../components/SettingItem";
 
 export default function CronManagement() {
   const [user, setUser] = useState("root");
@@ -121,40 +122,48 @@ export default function CronManagement() {
 
       <div style={{ backgroundColor: "#2b2d31", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
         <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>새 CRON 작업 추가</h3>
-        <div style={{ marginBottom: "1rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem" }}>스케줄 (예: 0 0 * * *)</label>
-          <input
-            type="text"
-            value={newSchedule}
-            onChange={(e) => setNewSchedule(e.target.value)}
-            placeholder="0 0 * * *"
-            style={{
-              width: "100%",
-              padding: "0.75rem",
-              backgroundColor: "#1e1e1e",
-              border: "1px solid #444",
-              borderRadius: "4px",
-              color: "white"
-            }}
-          />
-        </div>
-        <div style={{ marginBottom: "1rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem" }}>명령어</label>
-          <input
-            type="text"
-            value={newCommand}
-            onChange={(e) => setNewCommand(e.target.value)}
-            placeholder="/usr/bin/command"
-            style={{
-              width: "100%",
-              padding: "0.75rem",
-              backgroundColor: "#1e1e1e",
-              border: "1px solid #444",
-              borderRadius: "4px",
-              color: "white"
-            }}
-          />
-        </div>
+        <SettingItem
+          label="스케줄 (예: 0 0 * * *)"
+          input={
+            <input
+              type="text"
+              value={newSchedule}
+              onChange={(e) => setNewSchedule(e.target.value)}
+              placeholder="0 0 * * *"
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                backgroundColor: "#1e1e1e",
+                border: "1px solid #444",
+                borderRadius: "4px",
+                color: "white"
+              }}
+            />
+          }
+          hint="CRON 스케줄 형식: 분 시 일 월 요일 (예: 0 0 * * * = 매일 자정, */5 * * * * = 5분마다)"
+          description="스케줄 형식"
+        />
+        <SettingItem
+          label="명령어"
+          input={
+            <input
+              type="text"
+              value={newCommand}
+              onChange={(e) => setNewCommand(e.target.value)}
+              placeholder="/usr/bin/command"
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                backgroundColor: "#1e1e1e",
+                border: "1px solid #444",
+                borderRadius: "4px",
+                color: "white"
+              }}
+            />
+          }
+          hint="실행할 명령어 또는 스크립트의 전체 경로를 지정합니다."
+          description="실행 명령어"
+        />
         <button
           onClick={handleAdd}
           style={{
@@ -163,7 +172,8 @@ export default function CronManagement() {
             color: "white",
             border: "none",
             borderRadius: "4px",
-            cursor: "pointer"
+            cursor: "pointer",
+            marginTop: "1rem"
           }}
         >
           추가

@@ -117,6 +117,12 @@ public class SystemConfigStore {
         if (map.get("apacheSshPassword") != null) {
             config.setApacheSshPassword(map.get("apacheSshPassword").toString());
         }
+        if (map.get("ensmScriptsBasePath") != null) {
+            config.setEnsmScriptsBasePath(map.get("ensmScriptsBasePath").toString());
+        }
+        if (map.get("bindScriptPath") != null) {
+            config.setBindScriptPath(map.get("bindScriptPath").toString());
+        }
         if (map.get("systemName") != null) {
             config.setSystemName(map.get("systemName").toString());
         }

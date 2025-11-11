@@ -91,9 +91,7 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
 
   const sidebarContents = {
     ensm: [
-      { label: "기본 설정", path: "/ensm/settings" },
-      { label: "시스템 이름 수정", path: "/ensm/시스템이름수정" },
-      { label: "접속 가능 범위 수정", path: "/ensm/접속가능범위수정" }
+      { label: "기본 설정", path: "/ensm/settings" }
     ],
     system: [
       { label: "CRON 관리", path: "/system/cron" },
@@ -101,16 +99,14 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
     ],
     packages: [
       { label: "아파치 서버 config", path: "/packages/apache" },
-      { label: "BIND DNS config", path: "/packages/bind" },
-      { label: "메일서버 config", path: "/packages/mail" }
+      { label: "BIND DNS config", path: "/packages/bind" }
     ],
     network: [
       { label: "네트워크 상태 및 로그 확인", path: "/network/log" },
       { label: "개방 포트 및 관련 Daemon 확인", path: "/network/port" }
     ],
     tools: [
-      { label: "SSH 자동화", path: "/tools/ssh" },
-      { label: "웹 FTP", path: "/tools/webftp" }
+      { label: "SSH 자동화", path: "/tools/ssh" }
     ]
   };
 

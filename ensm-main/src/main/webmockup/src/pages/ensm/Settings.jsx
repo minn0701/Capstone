@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
+import SettingItem from "../../components/SettingItem";
 
 export default function Settings() {
   const [config, setConfig] = useState({
     authLogPath: "",
     mainLogPath: "",
+    ensmScriptsBasePath: "",
     apacheScriptPath: "",
     apacheSshEnabled: false,
     apacheSshHost: "",
     apacheSshUser: "",
     apacheSshPassword: "",
+    bindScriptPath: "",
     systemName: "",
     accessRange: "",
     kibanaBaseUrl: ""
@@ -204,22 +207,54 @@ export default function Settings() {
       <div style={sectionStyle}>
         <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>📝 로그 파일 경로</h3>
         
-        <label style={labelStyle}>인증 서버 로그 경로</label>
-        <input
-          type="text"
-          style={inputStyle}
-          value={config.authLogPath}
-          onChange={(e) => setConfig({ ...config, authLogPath: e.target.value })}
-          placeholder="/var/log/auth/auth-app.log"
+        <SettingItem
+          label="인증 서버 로그 경로"
+          input={
+            <input
+              type="text"
+              style={{ ...inputStyle, width: "100%" }}
+              value={config.authLogPath}
+              onChange={(e) => setConfig({ ...config, authLogPath: e.target.value })}
+              placeholder="/var/log/auth/auth-app.log"
+            />
+          }
+          hint="인증 서버(ensm-auth)의 로그 파일이 저장될 경로를 지정합니다."
+          description="로그 파일 경로"
         />
 
-        <label style={labelStyle}>메인 서버 로그 경로</label>
-        <input
-          type="text"
-          style={inputStyle}
-          value={config.mainLogPath}
-          onChange={(e) => setConfig({ ...config, mainLogPath: e.target.value })}
-          placeholder="/var/log/main/main-app.log"
+        <SettingItem
+          label="메인 서버 로그 경로"
+          input={
+            <input
+              type="text"
+              style={{ ...inputStyle, width: "100%" }}
+              value={config.mainLogPath}
+              onChange={(e) => setConfig({ ...config, mainLogPath: e.target.value })}
+              placeholder="/var/log/main/main-app.log"
+            />
+          }
+          hint="메인 서버(ensm-main)의 로그 파일이 저장될 경로를 지정합니다."
+          description="로그 파일 경로"
+        />
+      </div>
+
+      {/* 스크립트 경로 설정 */}
+      <div style={sectionStyle}>
+        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>📜 스크립트 경로 설정</h3>
+        
+        <SettingItem
+          label="ENSM 스크립트 기본 경로"
+          input={
+            <input
+              type="text"
+              style={{ ...inputStyle, width: "100%" }}
+              value={config.ensmScriptsBasePath}
+              onChange={(e) => setConfig({ ...config, ensmScriptsBasePath: e.target.value })}
+              placeholder="/usr/local/bin/ensm-scripts"
+            />
+          }
+          hint="ENSM 스크립트들이 위치한 기본 디렉토리 경로를 지정합니다. 서버에 배포된 스크립트 폴더의 경로입니다."
+          description="스크립트 기본 경로"
         />
       </div>
 
@@ -227,77 +262,137 @@ export default function Settings() {
       <div style={sectionStyle}>
         <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>🌐 Apache 설정</h3>
         
-        <label style={labelStyle}>Apache 스크립트 경로</label>
-        <input
-          type="text"
-          style={inputStyle}
-          value={config.apacheScriptPath}
-          onChange={(e) => setConfig({ ...config, apacheScriptPath: e.target.value })}
-          placeholder="/usr/local/bin/ensm/configure_apache.sh"
+        <SettingItem
+          label="Apache 스크립트 경로"
+          input={
+            <input
+              type="text"
+              style={{ ...inputStyle, width: "100%" }}
+              value={config.apacheScriptPath}
+              onChange={(e) => setConfig({ ...config, apacheScriptPath: e.target.value })}
+              placeholder="/usr/local/bin/ensm-scripts/apache/configure_apache.sh"
+            />
+          }
+          hint="Apache 설정을 변경하는 쉘 스크립트의 전체 경로를 지정합니다. 기본값: /usr/local/bin/ensm-scripts/apache/configure_apache.sh"
+          description="스크립트 경로"
         />
 
-        <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <input
-            type="checkbox"
-            checked={config.apacheSshEnabled}
-            onChange={(e) => setConfig({ ...config, apacheSshEnabled: e.target.checked })}
-            style={{ width: "auto" }}
-          />
-          SSH를 통한 원격 실행 사용
-        </label>
+        <SettingItem
+          label="SSH를 통한 원격 실행 사용"
+          input={
+            <input
+              type="checkbox"
+              checked={config.apacheSshEnabled}
+              onChange={(e) => setConfig({ ...config, apacheSshEnabled: e.target.checked })}
+              style={{ width: "auto" }}
+            />
+          }
+          hint="원격 서버에서 Apache 설정을 변경할 때 SSH를 통해 실행할지 여부를 지정합니다."
+          description="원격 실행 여부"
+        />
 
         {config.apacheSshEnabled && (
           <>
-            <label style={labelStyle}>SSH 호스트</label>
-            <input
-              type="text"
-              style={inputStyle}
-              value={config.apacheSshHost}
-              onChange={(e) => setConfig({ ...config, apacheSshHost: e.target.value })}
-              placeholder="192.168.1.100"
+            <SettingItem
+              label="SSH 호스트"
+              input={
+                <input
+                  type="text"
+                  style={{ ...inputStyle, width: "100%" }}
+                  value={config.apacheSshHost}
+                  onChange={(e) => setConfig({ ...config, apacheSshHost: e.target.value })}
+                  placeholder="192.168.1.100"
+                />
+              }
+              hint="원격 서버의 IP 주소 또는 호스트명을 지정합니다."
+              description="호스트 주소"
             />
 
-            <label style={labelStyle}>SSH 사용자</label>
-            <input
-              type="text"
-              style={inputStyle}
-              value={config.apacheSshUser}
-              onChange={(e) => setConfig({ ...config, apacheSshUser: e.target.value })}
-              placeholder="root"
+            <SettingItem
+              label="SSH 사용자"
+              input={
+                <input
+                  type="text"
+                  style={{ ...inputStyle, width: "100%" }}
+                  value={config.apacheSshUser}
+                  onChange={(e) => setConfig({ ...config, apacheSshUser: e.target.value })}
+                  placeholder="root"
+                />
+              }
+              hint="SSH 접속에 사용할 사용자명을 지정합니다."
+              description="사용자명"
             />
 
-            <label style={labelStyle}>SSH 비밀번호</label>
-            <input
-              type="password"
-              style={inputStyle}
-              value={config.apacheSshPassword}
-              onChange={(e) => setConfig({ ...config, apacheSshPassword: e.target.value })}
-              placeholder="비밀번호"
+            <SettingItem
+              label="SSH 비밀번호"
+              input={
+                <input
+                  type="password"
+                  style={{ ...inputStyle, width: "100%" }}
+                  value={config.apacheSshPassword}
+                  onChange={(e) => setConfig({ ...config, apacheSshPassword: e.target.value })}
+                  placeholder="비밀번호"
+                />
+              }
+              hint="SSH 접속에 사용할 비밀번호를 지정합니다. (보안상 주의 필요)"
+              description="비밀번호"
             />
           </>
         )}
+      </div>
+
+      {/* BIND 설정 */}
+      <div style={sectionStyle}>
+        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>🌐 BIND DNS 설정</h3>
+        
+        <SettingItem
+          label="BIND 스크립트 경로"
+          input={
+            <input
+              type="text"
+              style={{ ...inputStyle, width: "100%" }}
+              value={config.bindScriptPath}
+              onChange={(e) => setConfig({ ...config, bindScriptPath: e.target.value })}
+              placeholder="/usr/local/bin/ensm-scripts/bind/configure_bind.sh"
+            />
+          }
+          hint="BIND DNS 설정을 변경하는 쉘 스크립트의 전체 경로를 지정합니다. 기본값: /usr/local/bin/ensm-scripts/bind/configure_bind.sh"
+          description="스크립트 경로"
+        />
       </div>
 
       {/* 시스템 설정 */}
       <div style={sectionStyle}>
         <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>🖥️ 시스템 설정</h3>
         
-        <label style={labelStyle}>시스템 이름</label>
-        <input
-          type="text"
-          style={inputStyle}
-          value={config.systemName}
-          onChange={(e) => setConfig({ ...config, systemName: e.target.value })}
-          placeholder="ENSM"
+        <SettingItem
+          label="시스템 이름"
+          input={
+            <input
+              type="text"
+              style={{ ...inputStyle, width: "100%" }}
+              value={config.systemName}
+              onChange={(e) => setConfig({ ...config, systemName: e.target.value })}
+              placeholder="ENSM"
+            />
+          }
+          hint="ENSM 시스템의 이름을 지정합니다. 대시보드 및 UI에 표시됩니다."
+          description="시스템 식별명"
         />
 
-        <label style={labelStyle}>접속 가능 범위 (CIDR)</label>
-        <input
-          type="text"
-          style={inputStyle}
-          value={config.accessRange}
-          onChange={(e) => setConfig({ ...config, accessRange: e.target.value })}
-          placeholder="0.0.0.0/0"
+        <SettingItem
+          label="접속 가능 범위 (CIDR)"
+          input={
+            <input
+              type="text"
+              style={{ ...inputStyle, width: "100%" }}
+              value={config.accessRange}
+              onChange={(e) => setConfig({ ...config, accessRange: e.target.value })}
+              placeholder="0.0.0.0/0"
+            />
+          }
+          hint="시스템에 접속할 수 있는 IP 주소 범위를 CIDR 형식으로 지정합니다. 예: 192.168.1.0/24"
+          description="접속 허용 범위"
         />
       </div>
 
@@ -305,13 +400,19 @@ export default function Settings() {
       <div style={sectionStyle}>
         <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>📊 모니터링 설정</h3>
         
-        <label style={labelStyle}>Kibana 기본 URL (나중에 Prometheus + Grafana로 변경 예정)</label>
-        <input
-          type="text"
-          style={inputStyle}
-          value={config.kibanaBaseUrl}
-          onChange={(e) => setConfig({ ...config, kibanaBaseUrl: e.target.value })}
-          placeholder="/kibana"
+        <SettingItem
+          label="Kibana 기본 URL (나중에 Prometheus + Grafana로 변경 예정)"
+          input={
+            <input
+              type="text"
+              style={{ ...inputStyle, width: "100%" }}
+              value={config.kibanaBaseUrl}
+              onChange={(e) => setConfig({ ...config, kibanaBaseUrl: e.target.value })}
+              placeholder="/kibana"
+            />
+          }
+          hint="모니터링 대시보드의 기본 URL을 지정합니다. 향후 Prometheus + Grafana로 변경 예정입니다."
+          description="모니터링 URL"
         />
       </div>
 
