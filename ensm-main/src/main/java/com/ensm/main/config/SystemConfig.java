@@ -14,12 +14,18 @@ public class SystemConfig {
     private String authLogPath = "/var/log/auth/auth-app.log";
     private String mainLogPath = "/var/log/main/main-app.log";
     
+    // 스크립트 기본 경로
+    private String ensmScriptsBasePath = "/usr/local/bin/ensm-scripts";
+    
     // Apache 설정
-    private String apacheScriptPath = "/usr/local/bin/ensm/configure_apache.sh";
+    private String apacheScriptPath = "/usr/local/bin/ensm-scripts/apache/configure_apache.sh";
     private boolean apacheSshEnabled = false;
     private String apacheSshHost = "";
     private String apacheSshUser = "";
     private String apacheSshPassword = "";
+    
+    // BIND 설정
+    private String bindScriptPath = "/usr/local/bin/ensm-scripts/bind/configure_bind.sh";
     
     // 시스템 설정
     private String systemName = "ENSM";

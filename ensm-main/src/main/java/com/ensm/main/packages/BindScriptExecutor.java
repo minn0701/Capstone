@@ -19,8 +19,13 @@ public class BindScriptExecutor {
     private final SystemConfigStore configStore;
     
     private String getScriptPath() {
-        // 기본 스크립트 경로 (설정에서 가져올 수 있음)
-        return "/usr/local/bin/ensm/configure_bind.sh";
+        // SystemConfig에서 스크립트 경로 가져오기
+        String path = configStore.getConfig().getBindScriptPath();
+        // 설정이 없으면 기본값 사용
+        if (path == null || path.isEmpty()) {
+            return "/usr/local/bin/ensm-scripts/bind/configure_bind.sh";
+        }
+        return path;
     }
     
     public String execute(String[] args) {

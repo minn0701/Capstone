@@ -62,9 +62,39 @@
         }
     }
     
+    # Grafana 요청 처리
+    # ⚠️ Grafana 서버 설정 필요:
+    #    grafana.ini에서 root_url = http://main.minn.my:55555/grafana/ 설정
+    #    serve_from_sub_path = true 설정
+    handle /grafana/* {
+        reverse_proxy localhost:3000 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    # Kibana 요청 처리 (나중에 Prometheus + Grafana로 변경 예정)
+    handle /kibana/* {
+        reverse_proxy localhost:5601 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
     # 인증 관련 요청은 auth 서버(55556)로
     handle /auth/* {
         reverse_proxy localhost:55556 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    # API 요청 처리
+    handle /api/* {
+        reverse_proxy localhost:55557 {
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-Host {host}
             header_up X-Forwarded-Port {port}
@@ -83,24 +113,6 @@
     # 루트 경로는 auth 서버로 (로그인 페이지)
     handle / {
         reverse_proxy localhost:55556 {
-            header_up X-Forwarded-Proto {scheme}
-            header_up X-Forwarded-Host {host}
-            header_up X-Forwarded-Port {port}
-        }
-    }
-    
-    # API 요청 처리
-    handle /api/* {
-        reverse_proxy localhost:55557 {
-            header_up X-Forwarded-Proto {scheme}
-            header_up X-Forwarded-Host {host}
-            header_up X-Forwarded-Port {port}
-        }
-    }
-    
-    # Kibana 요청 처리 (나중에 Prometheus + Grafana로 변경 예정)
-    handle /kibana/* {
-        reverse_proxy localhost:5601 {
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-Host {host}
             header_up X-Forwarded-Port {port}
