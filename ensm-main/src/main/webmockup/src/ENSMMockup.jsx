@@ -211,7 +211,18 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
             >
               {!showSearch ? (
                   <>
-                    <div style={{ fontSize: "0.9rem", fontWeight: "bold", marginBottom: "12px" }}>{openSidebar?.toUpperCase()}</div>
+                    <div style={{
+                      fontSize: "0.8rem",
+                      fontWeight: "bold",
+                      marginBottom: "10px",
+                      textTransform: "uppercase",
+                      color: "#9ca3af",
+                      letterSpacing: "1px",
+                      borderBottom: "1px solid #444",
+                      paddingBottom: "6px"
+                    }}>
+                      {openSidebar?.toUpperCase()}
+                    </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                       {sidebarContents[openSidebar]?.map((item, idx) => (
                           <button
@@ -226,13 +237,14 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
                   </>
               ) : (
                   <>
-                    <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
                       <input
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                           placeholder="설정 검색..."
                           style={{
+                            flex: 1,
                             width: "80%",
                             padding: "4px 8px",
                             borderRadius: "4px",
@@ -244,6 +256,7 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
                       <button
                           onClick={handleSearch}
                           style={{
+                            height: "32px",
                             padding: "2px 6px",
                             backgroundColor: "#444",
                             border: "none",
