@@ -1,0 +1,110 @@
+# Caddy 리버스 프록시 설정
+# 포트 55555에서 외부 접속을 받아 내부 서버로 라우팅
+
+:55555 {
+    # 정적 파일 및 리소스는 직접 처리
+    # auth 서버의 정적 파일 (/static/*)
+    handle /static/* {
+        reverse_proxy localhost:55556 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    # main 서버의 정적 파일 (/main/static/*)
+    handle /main/static/* {
+        reverse_proxy localhost:55557 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    handle /main/descriptions/* {
+        reverse_proxy localhost:55557 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    handle /main/favicon.ico {
+        reverse_proxy localhost:55557 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    handle /main/manifest.json {
+        reverse_proxy localhost:55557 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    # auth 서버의 favicon, manifest 등
+    handle /favicon.ico {
+        reverse_proxy localhost:55556 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    handle /manifest.json {
+        reverse_proxy localhost:55556 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    # 인증 관련 요청은 auth 서버(55556)로
+    handle /auth/* {
+        reverse_proxy localhost:55556 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    # 메인 애플리케이션 요청은 main 서버(55557)로
+    handle /main/* {
+        reverse_proxy localhost:55557 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    # 루트 경로는 auth 서버로 (로그인 페이지)
+    handle / {
+        reverse_proxy localhost:55556 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    # API 요청 처리
+    handle /api/* {
+        reverse_proxy localhost:55557 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+    
+    # Kibana 요청 처리 (나중에 Prometheus + Grafana로 변경 예정)
+    handle /kibana/* {
+        reverse_proxy localhost:5601 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port {port}
+        }
+    }
+}
+
