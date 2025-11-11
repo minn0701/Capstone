@@ -103,7 +103,8 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
     ],
     network: [
       { label: "네트워크 상태 및 로그 확인", path: "/network/log" },
-      { label: "개방 포트 및 관련 Daemon 확인", path: "/network/port" }
+      { label: "개방 포트 및 관련 Daemon 확인", path: "/network/port" },
+      { label: "Cloudflare DDNS 관리", path: "/network/ddns" }
     ],
     tools: [
       { label: "SSH 자동화", path: "/tools/ssh" }

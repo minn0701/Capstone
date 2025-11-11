@@ -34,6 +34,16 @@ public class SystemConfig {
     // Kibana 설정 (나중에 Prometheus + Grafana로 변경 예정)
     private String kibanaBaseUrl = "";
     
+    // DDNS 설정
+    private boolean ddnsEnabled = false;
+    private String ddnsApiToken = "";
+    private String ddnsZoneName = "";
+    private String ddnsRecordName = "";
+    private int ddnsTtl = 120;
+    private String ddnsSchedule = "*/5 * * * *"; // 기본 5분마다
+    private String ddnsConfigFile = "/root/config/ddns-config.yml";
+    private String ddnsLogFile = "/var/log/ddns_cloudflare.log";
+    
     // 기타 설정
     private Map<String, String> customSettings = new HashMap<>();
 }

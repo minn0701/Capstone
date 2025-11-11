@@ -132,6 +132,30 @@ public class SystemConfigStore {
         if (map.get("kibanaBaseUrl") != null) {
             config.setKibanaBaseUrl(map.get("kibanaBaseUrl").toString());
         }
+        if (map.get("ddnsEnabled") != null) {
+            config.setDdnsEnabled(Boolean.parseBoolean(map.get("ddnsEnabled").toString()));
+        }
+        if (map.get("ddnsApiToken") != null) {
+            config.setDdnsApiToken(map.get("ddnsApiToken").toString());
+        }
+        if (map.get("ddnsZoneName") != null) {
+            config.setDdnsZoneName(map.get("ddnsZoneName").toString());
+        }
+        if (map.get("ddnsRecordName") != null) {
+            config.setDdnsRecordName(map.get("ddnsRecordName").toString());
+        }
+        if (map.get("ddnsTtl") != null) {
+            config.setDdnsTtl(Integer.parseInt(map.get("ddnsTtl").toString()));
+        }
+        if (map.get("ddnsSchedule") != null) {
+            config.setDdnsSchedule(map.get("ddnsSchedule").toString());
+        }
+        if (map.get("ddnsConfigFile") != null) {
+            config.setDdnsConfigFile(map.get("ddnsConfigFile").toString());
+        }
+        if (map.get("ddnsLogFile") != null) {
+            config.setDdnsLogFile(map.get("ddnsLogFile").toString());
+        }
         if (map.get("customSettings") instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<String, String> customSettings = (Map<String, String>) map.get("customSettings");

@@ -12,6 +12,7 @@ import ApacheConfig from "./pages/packages/ApacheConfig";
 import BindConfig from "./pages/packages/BindConfig";
 import NetworkLog from "./pages/network/NetworkLog";
 import PortDaemonStatus from "./pages/network/PortDaemonStatus";
+import DdnsManagement from "./pages/network/DdnsManagement";
 import SSHAutomation from "./pages/tools/SSHAutomation";
 import Dashboard from "./pages/Dashboard";
 import "./App.css";
@@ -84,9 +85,10 @@ function App() {
                 <Route path="/system/disk" element={<DiskRaidStatus />} />
                 <Route path="/packages/apache" element={<ApacheConfig />} />
                 <Route path="/packages/bind" element={<BindConfig />} />
-                <Route path="/network/log" element={<NetworkLog />} />
-                <Route path="/network/port" element={<PortDaemonStatus />} />
-                <Route path="/tools/ssh" element={<SSHAutomation />} />
+                       <Route path="/network/log" element={<NetworkLog />} />
+                       <Route path="/network/port" element={<PortDaemonStatus />} />
+                       <Route path="/network/ddns" element={<DdnsManagement />} />
+                       <Route path="/tools/ssh" element={<SSHAutomation />} />
             </Route>
         </Routes>
     );
