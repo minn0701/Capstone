@@ -6,7 +6,7 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(135deg, #2a2e55 0%, #4a2d6a 100%);
+  background: linear-gradient(135deg, #1e2148 0%, #2a2e55 40%, #4a2d6a 100%);
   font-family: sans-serif;
 }
 
@@ -21,6 +21,7 @@
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
   transition: all 0.5s ease-in-out;
   overflow: hidden;
+  border: 2px solid #4f545c;
 }
 
 /* 2-1. 로그인 박스 뒤 그라디언트 효과  */

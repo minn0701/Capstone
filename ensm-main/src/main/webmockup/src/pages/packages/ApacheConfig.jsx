@@ -78,7 +78,7 @@ export default function ApacheConfig() {
     <div style={{ marginBottom: "1.5rem", position: "relative", zIndex: 1000 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ width: "40%", position: "relative" }}>
-          <label style={{ fontWeight: "bold", display: "flex", alignItems: "center" }}>
+          <div style={{ fontWeight: "bold", display: "flex", alignItems: "center" }}>
             {label}
             <span style={{ display: "flex", alignItems: "center", marginLeft: "8px" }}>
               <button
@@ -101,7 +101,7 @@ export default function ApacheConfig() {
                 <HelpCircle size={16} />
               </button>
             </span>
-          </label>
+          </div>
           <div style={{ fontSize: "0.85rem", color: "#aaa", marginTop: "0.25rem" }}>{description}</div>
         </div>
         <div style={{ width: "55%", textAlign: "right" }}>{input}</div>
