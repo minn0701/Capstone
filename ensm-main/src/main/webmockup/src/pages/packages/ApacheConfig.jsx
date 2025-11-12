@@ -236,8 +236,8 @@ export default function ApacheConfig() {
         </div>
       )}
 
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem" }}>📂 Server Settings</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>Server Settings</h3>
         {renderSetting(
           "Port",
           <input
@@ -301,8 +301,8 @@ export default function ApacheConfig() {
       </div>
 
       {/* 기타 설정들은 UI만 표시 (향후 확장 가능) */}
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem" }}>📝 Logging</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>Logging</h3>
         {renderSetting("LogLevel", <select style={inputStyle} defaultValue="warn">
           <option value="debug">debug</option>
           <option value="info">info</option>
@@ -317,8 +317,8 @@ export default function ApacheConfig() {
         {renderSetting("CustomLog", <input type="text" placeholder="logs/access_log common" style={inputStyle} />, "접속 로그의 파일 경로와 형식을 지정합니다.", "접속 로그 설정")}
       </div>
 
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem" }}>🔐 Access Control</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>Access Control</h3>
         {renderSetting("Require", <input type="text" placeholder="all granted" style={inputStyle} />, "접근을 허용할 조건을 지정합니다. 예: all granted", "접근 제어 규칙")}
         {renderSetting("AllowOverride", <select style={inputStyle} defaultValue="All">
           <option value="None">None</option>
@@ -326,8 +326,8 @@ export default function ApacheConfig() {
         </select>, ".htaccess 파일의 적용 여부를 지정합니다.", "디렉터리 별 설정 허용")}
       </div>
 
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem" }}>📁 Directory Options</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>Directory Options</h3>
         {renderSetting("Indexes", renderToggle("Indexes"), "디렉토리 목록을 보여줄지 여부입니다.", "디렉터리 목록 표시")}
         {renderSetting("FollowSymLinks", renderToggle("FollowSymLinks"), "심볼릭 링크를 따라가도록 허용합니다.", "링크 추적 허용 여부")}
         {renderSetting("SymLinksIfOwnerMatch", renderToggle("SymLinksIfOwnerMatch"), "소유자가 같을 경우 심볼릭 링크를 허용합니다.", "소유자 일치 시 링크 허용")}

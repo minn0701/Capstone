@@ -58,12 +58,14 @@
 .doc-sidebar-title {
   font-size: 1.2rem;
   font-weight: bold;
+  margin-top: 0;
   margin-bottom: 0;
+  margin-left: -1rem;
 }
 
 .doc-sidebar-content {
   font-size: 0.95rem;
-  line-height: 1.6;
+  line-height: 1.2;
   white-space: pre-wrap;
   word-break: break-word;
   max-width: 100%;

@@ -149,7 +149,7 @@ export default function Settings() {
   };
 
   const inputStyle = {
-    width: "100%",
+    width: "50%",
     padding: "0.75rem",
     backgroundColor: "#2b2d31",
     border: "1px solid #444",
@@ -168,11 +168,10 @@ export default function Settings() {
   };
 
   const sectionStyle = {
-    backgroundColor: "#2b2d31",
-    padding: "1.5rem",
+    backgroundColor: "#313338",
+    padding: "1rem 1.5rem",
     borderRadius: "8px",
-    marginBottom: "1.5rem",
-    border: "1px solid #444"
+    marginBottom: "2rem"
   };
 
   if (loading) {
@@ -202,7 +201,7 @@ export default function Settings() {
 
       {/* 로그 파일 경로 설정 */}
       <div style={sectionStyle}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>📝 로그 파일 경로</h3>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>로그 파일 경로</h3>
         
         <label style={labelStyle}>인증 서버 로그 경로</label>
         <input
@@ -225,7 +224,7 @@ export default function Settings() {
 
       {/* Apache 설정 */}
       <div style={sectionStyle}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>🌐 Apache 설정</h3>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>Apache 설정</h3>
         
         <label style={labelStyle}>Apache 스크립트 경로</label>
         <input
@@ -280,7 +279,7 @@ export default function Settings() {
 
       {/* 시스템 설정 */}
       <div style={sectionStyle}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>🖥️ 시스템 설정</h3>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>시스템 설정</h3>
         
         <label style={labelStyle}>시스템 이름</label>
         <input
@@ -303,7 +302,7 @@ export default function Settings() {
 
       {/* 모니터링 설정 */}
       <div style={sectionStyle}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>📊 모니터링 설정</h3>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>모니터링 설정</h3>
         
         <label style={labelStyle}>Kibana 기본 URL (나중에 Prometheus + Grafana로 변경 예정)</label>
         <input
@@ -317,7 +316,7 @@ export default function Settings() {
 
       {/* 사용자 관리 */}
       <div style={sectionStyle}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem", color: "#fff" }}>👥 사용자 관리</h3>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>사용자 관리</h3>
         
         <div style={{ marginBottom: "1.5rem" }}>
           <h4 style={{ fontSize: "1rem", marginBottom: "0.75rem", color: "#ccc" }}>등록된 사용자</h4>
@@ -384,7 +383,8 @@ export default function Settings() {
               border: "none",
               borderRadius: "4px",
               cursor: "pointer",
-              fontSize: "0.9rem"
+              fontSize: "0.9rem",
+              marginLeft: "0.75rem"
             }}
           >
             사용자 추가

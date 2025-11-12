@@ -228,7 +228,9 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
                           <button
                               key={idx}
                               onClick={() => navigate(item.path)}
-                              style={{ background: "none", border: "none", color: "white", textAlign: "left", cursor: "pointer", paddingLeft: "8px" }}
+                              style={{ background: "none",border: "none", color: "white", textAlign: "left", display: "flex",  cursor: "pointer", paddingLeft: "8px", borderRadius: "4px", transition: "background-color 0.2s, color 0.2s" }}
+                              onMouseEnter={(e) => (e.target.style.backgroundColor = "#3b3d43")}
+                                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
                           >
                             {item.label}
                           </button>

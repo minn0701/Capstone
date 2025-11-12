@@ -23,6 +23,7 @@ export default function BindConfig() {
   const hintRefs = useRef({});
   const { setSelectedDocKey, setDocContent } = useOutletContext();
 
+
   const toggleSwitch = (key) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -30,6 +31,9 @@ export default function BindConfig() {
   const handleInputChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
+
+
+
 
   const handleSave = async () => {
     setLoading(true);
@@ -49,6 +53,8 @@ export default function BindConfig() {
       });
 
       const result = await response.text();
+
+
 
       if (response.ok) {
         setMessage("설정이 적용되었습니다.");
@@ -79,7 +85,7 @@ const loadMarkdown = async (label) => {
 };
 
   const renderSetting = (label, input, hint, description) => (
-    <div style={{ marginBottom: "1.5rem", position: "relative", zIndex: 0 }}>
+    <div style={{ marginBottom: "1.5rem", position: "relative", zIndex: 1000 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ width: "40%", position: "relative" }}>
           <label style={{ fontWeight: "bold", display: "flex", alignItems: "center" }}>
@@ -116,13 +122,13 @@ const loadMarkdown = async (label) => {
       position: "absolute",
       left:"0px",
       top: "-90px",
-        backgroundColor: "#f1f1f1",
+        backgroundColor: "#fff",
         color: "black",
       padding: "10px 12px",
       borderRadius: "8px",
-      boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+      boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
       minWidth: "240px",
-      zIndex: 9999
+      zIndex: 100001
     }}
   >
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
@@ -237,11 +243,8 @@ return (
       )}
 
 
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-
-
-
-        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📂 /etc/named.conf파일</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>/etc/named.conf 파일</h3>
         {renderSetting("listen-on port 53", <input type="text" value={formData.listenOn} onChange={(e) => handleInputChange("listenOn", e.target.value)} placeholder="127.0.0.1" style={inputStyle} />, "IPv4 주소에서 수신할 인터페이스를 지정합니다.", "IPv4 수신 주소")}
         {renderSetting("listen-on-v6 port 53", <input type="text" value={formData.listenOnV6} onChange={(e) => handleInputChange("listenOnV6", e.target.value)} placeholder="::1" style={inputStyle} />, "IPv6 주소에서 수신할 인터페이스를 지정합니다.", "IPv6 수신 주소")}
         {renderSetting("forward", <select value={formData.forward} onChange={(e) => handleInputChange("forward", e.target.value)} style={inputStyle}>
@@ -256,8 +259,8 @@ return (
       </div>
 
 
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📝 zone 구문</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>zone 구문</h3>
 
         {renderSetting("zone 도메인명", <input type="text" value={formData.zoneDomain} onChange={(e) => handleInputChange("zoneDomain", e.target.value)} placeholder="example.com" style={inputStyle} />, "Zone의 도메인 이름을 지정합니다.", "Zone 도메인")}
         {renderSetting("type", <select value={formData.zoneType} onChange={(e) => handleInputChange("zoneType", e.target.value)} style={inputStyle}>
@@ -270,8 +273,8 @@ return (
 
       </div>
 
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📁 zone 파일</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>zone 파일</h3>
         {renderSetting("$TTL", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("사이트 이름", <input type="text" placeholder="linux.com" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("DNS server adderess", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
@@ -284,8 +287,8 @@ return (
 
       </div>
 
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📦로컬 네임 서버 설정(/etc/hosts)</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>로컬 네임 서버 설정(/etc/hosts)</h3>
 
         {renderSetting("name server_hosts", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("IP address_hosts", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
@@ -293,15 +296,15 @@ return (
 
       </div>
 
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>👤 외부 네임 서버 설정(/etc/resolv.conf)</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>외부 네임 서버 설정(/etc/resolv.conf)</h3>
 
         {renderSetting("name server_resolv.conf", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("IP address_resolv.conf", <input type="text" placeholder="192.168.100.5" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
       </div>
 
-      <div style={{ backgroundColor: "#313338", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1rem" }}>📄 네임 서버 정의 파일일</h3>
+      <div style={{ backgroundColor: "#313338", padding: "1rem 1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
+        <h3 style={{ fontSize: "1.3rem", borderBottom: "1.5px solid #666666", fontWeight: "bold", marginBottom: "2rem", color: "#f2f2d3", paddingBottom: "0.4rem" }}>네임 서버 정의 파일일</h3>
 
         {renderSetting("도메인", <input type="text" placeholder="" style={inputStyle} />, "도메인 또는 IP를 지정하여 요청을 처리합니다.", "서버 도메인명")}
         {renderSetting("방향", renderToggle("authz_user_module"), "정방향 / 역방향", "mod_authz_user 로드 여부")}
