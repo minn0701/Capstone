@@ -1,0 +1,8 @@
+rootProject.name = 'ensm'
+
+include 'ensm-auth'
+include 'ensm-main'
+
+project(':ensm-auth').projectDir = file('ensm-auth')
+project(':ensm-main').projectDir = file('ensm-main')
+

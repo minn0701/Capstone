@@ -1,0 +1,113 @@
+plugins {
+    id 'java'
+    id 'nebula.ospackage' version '11.0.0'
+}
+
+group = 'com.ensm'
+version = '0.0.1-SNAPSHOT'
+
+// 서브프로젝트 빌드 의존성
+def authProject = project(':ensm-auth')
+def mainProject = project(':ensm-main')
+
+// RPM 패키징 설정
+ospackage {
+    packageName = 'ensm'
+    version = project.version.replace('-SNAPSHOT', '')
+    release = '1'
+    arch = 'noarch'
+    os = LINUX
+    
+    summary = 'ENSM - Enterprise Network System Management'
+    description = 'ENSM (Enterprise Network System Management) - 통합 시스템 관리 플랫폼'
+    vendor = 'ENSM Project'
+    license = 'Proprietary'
+    packager = 'ENSM Team'
+    url = 'https://github.com/ensm/ensm'
+    
+    // 의존성 패키지
+    requires('java-21-openjdk')
+    requires('systemd')
+    requires('caddy')
+    requires('grafana')
+    
+    // 설치 전 스크립트
+    preInstall file('rpm-scripts/preinstall.sh')
+    postInstall file('rpm-scripts/postinstall.sh')
+    preUninstall file('rpm-scripts/preuninstall.sh')
+    postUninstall file('rpm-scripts/postuninstall.sh')
+    
+    // JAR 파일 배치
+    into('/opt/ensm') {
+        from(authProject.tasks.bootJar) {
+            rename { 'ensm-auth.jar' }
+        }
+        from(mainProject.tasks.bootJar) {
+            rename { 'ensm-main.jar' }
+        }
+    }
+    
+    // 스크립트 배치
+    into('/usr/local/bin/ensm-scripts') {
+        from('ensm-scripts') {
+            include '**/*.sh'
+            include '**/*.md'
+            fileMode = 0755
+        }
+    }
+    
+    // systemd 서비스 파일
+    into('/usr/lib/systemd/system') {
+        from('rpm-scripts/systemd') {
+            include '*.service'
+        }
+    }
+    
+    // Caddy 설정 파일
+    into('/etc/caddy') {
+        from('Docs/Caddyfile') {
+            rename { 'Caddyfile' }
+        }
+    }
+    
+    // Grafana 설정 파일 (템플릿)
+    into('/etc/grafana') {
+        from('rpm-scripts/grafana') {
+            include 'grafana.ini.template'
+        }
+    }
+    
+    // 설정 디렉토리
+    into('/etc/ensm') {
+        createDirectoryEntry = true
+        fileMode = 0755
+    }
+    
+    // 로그 디렉토리
+    into('/var/log/ensm') {
+        createDirectoryEntry = true
+        fileMode = 0755
+    }
+    into('/var/log/ensm/auth') {
+        createDirectoryEntry = true
+        fileMode = 0755
+    }
+    into('/var/log/ensm/main') {
+        createDirectoryEntry = true
+        fileMode = 0755
+    }
+}
+
+buildRpm {
+    dependsOn ':ensm-auth:bootJar', ':ensm-main:bootJar'
+    arch = 'noarch'
+    
+    packageGroup = 'Applications/System'
+    packageDescription = 'ENSM - Enterprise Network System Management'
+    
+    fileMode = 0644
+    directoryMode = 0755
+    
+    changelogFile = file('rpm-scripts/CHANGELOG')
+}
+
