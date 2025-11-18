@@ -19,6 +19,12 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
   const searchRef = useRef(null);
   const navigate = useNavigate();
 
+  const handleNavigate = (path) => {
+    navigate(path);
+    setOpenSidebar(null);   // 열린 사이드바 닫기
+    setShowSearch(false);   // 검색 패널도 닫기 (검색 모드일 때)
+  };
+
   const handleSearch = () => {
     console.log("검색어:", searchQuery);
   };
@@ -227,7 +233,7 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
                       {sidebarContents[openSidebar]?.map((item, idx) => (
                           <button
                               key={idx}
-                              onClick={() => navigate(item.path)}
+                              onClick={() => handleNavigate(item.path)}
                               style={{ background: "none",border: "none", color: "white", textAlign: "left", display: "flex",  cursor: "pointer", paddingLeft: "8px", borderRadius: "4px", transition: "background-color 0.2s, color 0.2s" }}
                               onMouseEnter={(e) => (e.target.style.backgroundColor = "#3b3d43")}
                                 onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
