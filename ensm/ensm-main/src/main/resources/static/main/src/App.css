@@ -1,0 +1,187 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ✅ 설명서 사이드바 스타일 */
+.doc-sidebar {
+  background-color: #313338;
+  color: white;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #444;
+  /* 스크롤바 스타일링 (WebKit 기반 브라우저) */
+  scrollbar-width: thin;
+  scrollbar-color: #444 #313338;
+}
+
+/* 스크롤바 스타일 (WebKit 기반 브라우저용) */
+.doc-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.doc-sidebar::-webkit-scrollbar-track {
+  background: #313338;
+}
+
+.doc-sidebar::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+.doc-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.doc-sidebar-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.doc-sidebar-content {
+  flex: 1;
+  padding: 16px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ✅ Markdown 전용 스타일 */
+.doc-sidebar-content h1 {
+  font-size: 1.5rem;
+  border-bottom: 2px solid #5865f2;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.doc-sidebar-content h2 {
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #5865f2;
+}
+
+.doc-sidebar-content h3 {
+  font-size: 1.1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.doc-sidebar-content p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+
+.doc-sidebar-content ul,
+.doc-sidebar-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+  padding-left: 0;
+}
+
+.doc-sidebar-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.doc-sidebar-content pre {
+  background-color: #1e1f22;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 1rem;
+  border: 1px solid #444;
+}
+
+.doc-sidebar-content code {
+  background-color: #1e1f22;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.doc-sidebar-content pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.doc-sidebar-content blockquote {
+  border-left: 4px solid #5865f2;
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-bottom: 1rem;
+  color: #aaa;
+  font-style: italic;
+}
+
+.doc-sidebar-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.doc-sidebar-content th,
+.doc-sidebar-content td {
+  border: 1px solid #444;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.doc-sidebar-content th {
+  background-color: #2b2d31;
+  font-weight: bold;
+}
+
+.doc-sidebar-content a {
+  color: #5865f2;
+  text-decoration: none;
+}
+
+.doc-sidebar-content a:hover {
+  text-decoration: underline;
+}

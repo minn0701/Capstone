@@ -1,0 +1,13 @@
+[Unit]
+Description=ENSM Post-Installation Setup
+After=network.target
+Before=ensm.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/ensm-scripts/system/ensm-postinstall.sh
+
+[Install]
+WantedBy=multi-user.target
+

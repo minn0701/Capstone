@@ -1,0 +1,76 @@
+// 루트 프로젝트 빌드 설정
+// 실제 빌드는 각 서브프로젝트에서 수행
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    
+    group = 'com.ensm'
+    version = '0.0.1-SNAPSHOT'
+    
+    java {
+        sourceCompatibility = '21'
+    }
+    
+    repositories {
+        mavenCentral()
+    }
+}
+
+// 전체 빌드 태스크 (clean 후 빌드)
+task buildAll {
+    dependsOn ':ensm-auth:clean'
+    dependsOn ':ensm-main:clean'
+    dependsOn ':ensm-auth:build'
+    dependsOn ':ensm-main:build'
+    description = '모든 서브프로젝트 clean 후 빌드'
+}
+
+// clean 순서 명시 (태스크 참조 사용)
+project(':ensm-auth').tasks.named('build').configure { it.mustRunAfter('clean') }
+project(':ensm-main').tasks.named('build').configure { it.mustRunAfter('clean') }
+
+// JAR 파일을 RPM SOURCES로 복사하는 태스크
+task copyJarsToRpmSources(type: Copy) {
+    dependsOn buildAll
+    from('ensm-auth/build/libs/ensm-auth-0.0.1-SNAPSHOT.jar')
+    from('ensm-main/build/libs/ensm-main-0.0.1-SNAPSHOT.jar')
+    into('ensm-rpm/SOURCES')
+    description = '빌드된 JAR 파일을 RPM SOURCES로 복사'
+}
+
+// 이전 JAR 파일 및 스크립트 폴더 삭제 태스크
+task cleanRpmSources(type: Delete) {
+    delete 'ensm-rpm/SOURCES/ensm-auth-0.0.1-SNAPSHOT.jar'
+    delete 'ensm-rpm/SOURCES/ensm-main-0.0.1-SNAPSHOT.jar'
+    delete 'ensm-rpm/SOURCES/ensm-scripts'
+    description = 'RPM SOURCES의 이전 파일 삭제 (JAR 및 스크립트)'
+}
+
+// ensm-scripts를 RPM SOURCES로 복사하는 태스크
+task copyScriptsToRpmSources(type: Copy) {
+    dependsOn cleanRpmSources
+    from('ensm-scripts')
+    into('ensm-rpm/SOURCES/ensm-scripts')
+    description = 'ensm-scripts를 RPM SOURCES로 복사'
+    // 모든 파일 포함 (.sh, .c, README.md 등)
+    include '**/*'
+}
+
+// 전체 빌드 및 복사 태스크
+task buildForRpm {
+    dependsOn cleanRpmSources
+    dependsOn copyJarsToRpmSources
+    dependsOn copyScriptsToRpmSources
+    description = 'RPM 빌드를 위한 전체 빌드 및 파일 복사'
+}
+
+// 태스크 순서 명시
+copyJarsToRpmSources.mustRunAfter cleanRpmSources
+copyScriptsToRpmSources.mustRunAfter cleanRpmSources
+

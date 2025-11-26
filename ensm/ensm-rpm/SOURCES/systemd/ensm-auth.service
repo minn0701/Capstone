@@ -1,0 +1,27 @@
+[Unit]
+Description=ENSM Authentication Server
+After=network.target
+
+[Service]
+Type=simple
+User=ensm
+Group=ensm
+WorkingDirectory=/opt/ensm
+ExecStart=/opt/ensm/java/jdk/bin/java $JAVA_OPTS -jar /opt/ensm/ensm-auth.jar
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ensm-auth
+
+# 환경 변수
+Environment="LOG_PATH_AUTH=/var/log/ensm/auth/auth-app.log"
+Environment="JAVA_OPTS=-Xms256m -Xmx512m"
+
+# 보안 설정
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+

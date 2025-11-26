@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENSM 초기 설정</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1e1f22;
+        }
+
+        .login-box {
+            background-color: #2b2d31;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 320px;
+            color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            transition: all 0.5s ease-in-out;
+        }
+
+        .login-box h2 {
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+
+        .login-box input {
+            width: 93%;
+            padding: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid #555;
+            background-color: #1e1f22;
+            color: white;
+            border-radius: 4px;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #4ade80;
+        }
+
+        .login-box input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4ade80;
+            color: black;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 0.75rem;
+            transition: background-color 0.2s;
+        }
+
+        .login-box button:hover:not(:disabled) {
+            background-color: #3bc96f;
+        }
+
+        .login-box button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #ff4444;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background-color: #2a1a1a;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .description {
+            color: #ccc;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>ENSM 초기 설정</h2>
+            <p class="description">
+                최초 관리자 계정을 생성해주세요.
+            </p>
+            
+            <div id="errorMessage" class="error-message"></div>
+
+            <form id="setupForm">
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="관리자 사용자명"
+                    required
+                    autocomplete="username"
+                />
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="비밀번호 (6자 이상)"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                />
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="비밀번호 확인"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                />
+                <button type="submit" id="submitButton">계정 생성</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const submitButton = document.getElementById('submitButton');
+        const errorMessage = document.getElementById('errorMessage');
+        const setupForm = document.getElementById('setupForm');
+
+        // 최초 설치 여부 확인
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/auth/setup/check');
+                const data = await response.json();
+                
+                if (!data.needsSetup) {
+                    // 이미 설정이 완료되었으면 로그인 페이지로
+                    window.location.href = '/';
+                }
+            } catch (err) {
+                console.error('설정 확인 실패:', err);
+            }
+        });
+
+        // 에러 메시지 표시 함수
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        // 에러 메시지 숨기기 함수
+        function hideError() {
+            errorMessage.classList.remove('show');
+        }
+
+        // 폼 제출 처리
+        setupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            // 유효성 검사
+            if (!username || username.length === 0) {
+                showError('사용자명을 입력해주세요.');
+                return;
+            }
+
+            if (!password || password.length < 6) {
+                showError('비밀번호는 6자 이상이어야 합니다.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('비밀번호가 일치하지 않습니다.');
+                return;
+            }
+
+            // 로딩 상태 설정
+            submitButton.disabled = true;
+            submitButton.textContent = '설정 중...';
+            usernameInput.disabled = true;
+            passwordInput.disabled = true;
+            confirmPasswordInput.disabled = true;
+
+            try {
+                const response = await fetch('/auth/setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || '설정 실패');
+                }
+
+                // 설정 완료 후 로그인 페이지로
+                alert('관리자 계정이 생성되었습니다. 로그인해주세요.');
+                window.location.href = '/';
+
+            } catch (error) {
+                showError(error.message || '설정 중 오류가 발생했습니다.');
+                
+                // 로딩 상태 해제
+                submitButton.disabled = false;
+                submitButton.textContent = '계정 생성';
+                usernameInput.disabled = false;
+                passwordInput.disabled = false;
+                confirmPasswordInput.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
+

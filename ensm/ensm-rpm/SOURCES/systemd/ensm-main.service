@@ -1,0 +1,28 @@
+[Unit]
+Description=ENSM Main Server
+After=network.target ensm-auth.service
+Wants=ensm-auth.service
+
+[Service]
+Type=simple
+User=ensm
+Group=ensm
+WorkingDirectory=/opt/ensm
+ExecStart=/opt/ensm/java/jdk/bin/java $JAVA_OPTS -jar /opt/ensm/ensm-main.jar
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ensm-main
+
+# 환경 변수
+Environment="LOG_PATH_MAIN=/var/log/ensm/main/main-app.log"
+Environment="JAVA_OPTS=-Xms512m -Xmx1024m"
+
+# 보안 설정
+# NoNewPrivileges=true  # setuid 바이너리 실행을 위해 비활성화
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
