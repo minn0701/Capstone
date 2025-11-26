@@ -6,11 +6,34 @@ positions:
 clients:
   - url: http://127.0.0.1:3100/loki/api/v1/push
 scrape_configs:
-  - job_name: system
+  # 시스템 로그 파일 수집
+  - job_name: varlogs
     static_configs:
       - targets:
           - localhost
         labels:
           job: varlogs
           __path__: /var/log/*.log
+  
+  # ENSM 애플리케이션 로그 수집
+  - job_name: ensm
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: ensm
+          __path__: /var/log/ensm/**/*.log
+  
+  # journald 로그 수집
+  - job_name: journald
+    journal:
+      max_age: 12h
+      path: /var/log/journal
+      labels:
+        job: journald
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+      - source_labels: ['__journal__hostname']
+        target_label: 'hostname'
 
