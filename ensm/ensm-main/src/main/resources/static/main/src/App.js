@@ -1,5 +1,3 @@
-// App.jsx 수정 사항 포함된 전체 코드 (📄 문서 버튼 작동 + UI 통일)
-
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { useState } from "react";
 import React from "react";
@@ -10,6 +8,9 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ToastContainer, useToast } from "./components/Toast";
+
+// ★ [추가] 테마 공급자 import (파일 경로가 src/context/ThemeContext.js 라고 가정)
+import { ThemeProvider } from "./context/ThemeContext";
 
 import Settings from "./pages/ensm/Settings";
 import CronManagement from "./pages/system/CronManagement";
@@ -85,8 +86,8 @@ function LayoutWrapper() {
         <>
             <ToastContainer toasts={toasts} removeToast={removeToast} />
             <div style={{ display: "flex", width: "100%", height: "100vh", overflow: "hidden" }}>
-                <div 
-                    style={{ 
+                <div
+                    style={{
                         flex: selectedDocKey ? `0 0 calc(100% - ${sidebarWidth}px)` : "1 1 100%",
                         transition: "flex 0.3s ease-in-out",
                         overflow: "auto",
@@ -114,7 +115,7 @@ function LayoutWrapper() {
                             position: "relative"
                         }}
                     >
-                        {/* 리사이저 핸들러 - 사이드바 왼쪽 경계에 absolute로 배치 */}
+                        {/* 리사이저 핸들러 */}
                         <div
                             onMouseDown={handleMouseDown}
                             style={{
@@ -193,35 +194,39 @@ function LayoutWrapper() {
 
 function App() {
     return (
-        <ErrorBoundary>
-            <Routes>
-                <Route element={<LayoutWrapper />}>
-                    <Route index element={<Navigate to="/dashboard" replace />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/ensm/settings" element={<Settings />} />
-                    <Route path="/system/cron" element={<CronManagement />} />
-                    <Route path="/system/disk" element={<DiskRaidStatus />} />
-                    <Route path="/system/disk-management" element={<DiskManagement />} />
-                    <Route path="/system/raid" element={<RaidManagement />} />
-                    <Route path="/system/lvm" element={<LvmManagement />} />
-                    <Route path="/packages/apache" element={<ApacheConfig />} />
-                    <Route path="/packages/bind" element={<BindConfig />} />
-                    <Route path="/packages/vsftpd" element={<VsftpdConfig />} />
-                    <Route path="/packages/nfs" element={<NfsConfig />} />
-                    <Route path="/packages/docker" element={<DockerConfig />} />
-                    <Route path="/packages/git" element={<GitConfig />} />
-                    <Route path="/packages/jellyfin" element={<JellyfinConfig />} />
-                    <Route path="/packages/plex" element={<PlexConfig />} />
-                    <Route path="/packages/home-assistant" element={<HomeAssistantConfig />} />
-                    <Route path="/packages/novnc" element={<NovncConfig />} />
-                    <Route path="/packages/management" element={<PackageManagement />} />
-                    <Route path="/network/log" element={<NetworkLog />} />
-                    <Route path="/network/port" element={<PortDaemonStatus />} />
-                    <Route path="/network/ddns" element={<DdnsManagement />} />
-                    <Route path="/tools/ssh" element={<SSHAutomation />} />
-                </Route>
-            </Routes>
-        </ErrorBoundary>
+        // ★ [추가] ThemeProvider로 앱 전체를 감싸줍니다.
+        // 이제 ErrorBoundary, Routes, 그리고 그 안의 모든 페이지에서 useTheme()을 쓸 수 있어요!
+        <ThemeProvider>
+            <ErrorBoundary>
+                <Routes>
+                    <Route element={<LayoutWrapper />}>
+                        <Route index element={<Navigate to="/dashboard" replace />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/ensm/settings" element={<Settings />} />
+                        <Route path="/system/cron" element={<CronManagement />} />
+                        <Route path="/system/disk" element={<DiskRaidStatus />} />
+                        <Route path="/system/disk-management" element={<DiskManagement />} />
+                        <Route path="/system/raid" element={<RaidManagement />} />
+                        <Route path="/system/lvm" element={<LvmManagement />} />
+                        <Route path="/packages/apache" element={<ApacheConfig />} />
+                        <Route path="/packages/bind" element={<BindConfig />} />
+                        <Route path="/packages/vsftpd" element={<VsftpdConfig />} />
+                        <Route path="/packages/nfs" element={<NfsConfig />} />
+                        <Route path="/packages/docker" element={<DockerConfig />} />
+                        <Route path="/packages/git" element={<GitConfig />} />
+                        <Route path="/packages/jellyfin" element={<JellyfinConfig />} />
+                        <Route path="/packages/plex" element={<PlexConfig />} />
+                        <Route path="/packages/home-assistant" element={<HomeAssistantConfig />} />
+                        <Route path="/packages/novnc" element={<NovncConfig />} />
+                        <Route path="/packages/management" element={<PackageManagement />} />
+                        <Route path="/network/log" element={<NetworkLog />} />
+                        <Route path="/network/port" element={<PortDaemonStatus />} />
+                        <Route path="/network/ddns" element={<DdnsManagement />} />
+                        <Route path="/tools/ssh" element={<SSHAutomation />} />
+                    </Route>
+                </Routes>
+            </ErrorBoundary>
+        </ThemeProvider>
     );
 }
 

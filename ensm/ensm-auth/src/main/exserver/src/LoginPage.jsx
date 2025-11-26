@@ -70,7 +70,7 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-box">
         <>
-          <h2>ENSM 로그인</h2>
+          <h2>E N S M</h2>
           <input
             type="text"
             placeholder="아이디"

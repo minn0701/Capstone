@@ -41,87 +41,37 @@ export default function Dashboard() {
     };
   }, []);
 
-  // 다크모드에 따른 스타일
-  const backgroundColor = isDarkMode ? "#0e0e0e" : "#f0f2f5";
-  const textColor = isDarkMode ? "#fff" : "#333";
-  const cardBg = isDarkMode ? "#1e1e1e" : "#fff";
-  const cardBorder = isDarkMode ? "#444" : "#ddd";
-  const cardShadow = isDarkMode ? "0 0 10px rgba(0,0,0,0.5)" : "0 2px 4px rgba(0,0,0,0.1)";
-  const headingColor = isDarkMode ? "#fff" : "#333";
-
-  // Grafana 패널 URL 생성 함수
+  // Grafana 패널 URL 생성 함수 (기존 로직 유지)
   const getGrafanaPanelUrl = (panelId, width = 1000, height = 500) => {
     const theme = isDarkMode ? "dark" : "light";
     // d-solo 모드: 패널만 표시 (대시보드 UI 없음)
     return `/grafana/d-solo/sysmon-gauges/system-monitor-gauge-logs?orgId=1&panelId=${panelId}&theme=${theme}&refresh=10s&width=${width}&height=${height}`;
   };
 
-  // 공통 iframe 스타일 (자연스럽게 보이도록)
-  const iframeStyle = {
-    width: "100%",
-    height: "100%",
-    border: "none",
-    display: "block",
-    backgroundColor: "transparent",
-    overflow: "hidden",
-    margin: 0,
-    padding: 0,
-    outline: "none"
-  };
-
-  // 패널 컨테이너 스타일
-  const panelContainerStyle = {
-    backgroundColor: cardBg,
-    border: `1px solid ${cardBorder}`,
-    borderRadius: "12px",
-    boxShadow: cardShadow,
-    padding: "16px",
-    overflow: "hidden",
-    position: "relative",
-    transition: "box-shadow 0.3s ease, border-color 0.3s ease"
-  };
-
-  // iframe 래퍼 스타일 (Grafana 패널이 자연스럽게 보이도록)
-  const iframeWrapperStyle = {
-    width: "100%",
-    height: "100%",
-    position: "relative",
-    overflow: "hidden",
-    borderRadius: "8px",
-    backgroundColor: cardBg,
-    // Grafana 패널의 배경과 자연스럽게 블렌딩
-    isolation: "isolate"
-  };
-
   return (
-    <div style={{ padding: "24px", background: backgroundColor, minHeight: "100vh", color: textColor }}>
-      {/* 시스템 리소스 모니터링 */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h2 style={{ 
-          fontSize: "1.75rem", 
-          marginBottom: "1.5rem", 
-          fontWeight: 600, 
-          color: headingColor,
-          letterSpacing: "-0.02em"
-        }}>
-          시스템 리소스 모니터링
-        </h2>
-        <div
-          style={{
-            display: "grid",
-            gap: "20px",
-            gridTemplateColumns: "repeat(3, minmax(0, 1fr))"
-          }}
-        >
+    <div style={styles.pageContainer}>
+      <header style={styles.header}>
+        <h2 style={styles.pageTitle}>시스템 통합 대시보드</h2>
+        <p style={styles.pageSubtitle}>
+          실시간 시스템 리소스 상태와 보안 로그를 중앙에서 모니터링합니다.
+        </p>
+      </header>
+
+      {/* 시스템 리소스 모니터링 섹션 */}
+      <section style={{ marginBottom: "2.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem", gap: "0.5rem" }}>
+          <span style={{ fontSize: "1.2rem" }}></span>
+          <h3 style={styles.sectionTitle}>시스템 리소스 현황</h3>
+        </div>
+        
+        <div style={styles.gridContainer}>
           {/* CPU Usage 패널 */}
-          <div style={panelContainerStyle}>
-            <div style={{ 
-              ...iframeWrapperStyle,
-              height: "280px"
-            }}>
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>CPU 사용률</div>
+            <div style={styles.iframeWrapper}>
               <iframe
                 src={getGrafanaPanelUrl(1, 1000, 500)}
-                style={iframeStyle}
+                style={styles.iframe}
                 title="CPU Usage"
                 allow="fullscreen"
                 scrolling="no"
@@ -131,14 +81,12 @@ export default function Dashboard() {
           </div>
 
           {/* Memory Usage 패널 */}
-          <div style={panelContainerStyle}>
-            <div style={{ 
-              ...iframeWrapperStyle,
-              height: "280px"
-            }}>
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>메모리 사용률</div>
+            <div style={styles.iframeWrapper}>
               <iframe
                 src={getGrafanaPanelUrl(2, 1000, 500)}
-                style={iframeStyle}
+                style={styles.iframe}
                 title="Memory Usage"
                 allow="fullscreen"
                 scrolling="no"
@@ -148,14 +96,12 @@ export default function Dashboard() {
           </div>
 
           {/* Disk Usage 패널 */}
-          <div style={panelContainerStyle}>
-            <div style={{ 
-              ...iframeWrapperStyle,
-              height: "280px"
-            }}>
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>디스크 사용률</div>
+            <div style={styles.iframeWrapper}>
               <iframe
                 src={getGrafanaPanelUrl(3, 1000, 500)}
-                style={iframeStyle}
+                style={styles.iframe}
                 title="Disk Usage"
                 allow="fullscreen"
                 scrolling="no"
@@ -164,32 +110,20 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* 시스템 로그 모니터링 */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h2 style={{ 
-          fontSize: "1.75rem", 
-          marginBottom: "1.5rem", 
-          fontWeight: 600, 
-          color: headingColor,
-          letterSpacing: "-0.02em"
-        }}>
-          시스템 로그 모니터링
-        </h2>
-        <div style={{
-          ...panelContainerStyle,
-          padding: "0",
-          height: "600px"
-        }}>
-          <div style={{
-            ...iframeWrapperStyle,
-            height: "100%",
-            borderRadius: "12px"
-          }}>
+      {/* 시스템 로그 모니터링 섹션 */}
+      <section>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem", gap: "0.5rem" }}>
+          <span style={{ fontSize: "1.2rem" }}></span>
+          <h3 style={styles.sectionTitle}>실시간 시스템 로그</h3>
+        </div>
+        
+        <div style={{ ...styles.card, height: "650px", padding: "0" }}>
+          <div style={{ ...styles.iframeWrapper, borderRadius: "12px" }}>
             <iframe
               src={getGrafanaPanelUrl(4, 2000, 1200)}
-              style={iframeStyle}
+              style={styles.iframe}
               title="System Logs"
               allow="fullscreen"
               scrolling="no"
@@ -197,7 +131,83 @@ export default function Dashboard() {
             />
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
+
+// ==========================================
+// Styles Object (Consistent Theme)
+// ==========================================
+const styles = {
+  pageContainer: {
+    padding: "2rem max(2rem, 5vw)",
+    backgroundColor: "var(--bg-primary, #1e1e1e)",
+    minHeight: "100vh",
+    color: "var(--text-primary, #ffffff)",
+    fontFamily: "'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif",
+  },
+  header: {
+    marginBottom: "2.5rem",
+    borderBottom: "1px solid var(--border-color, #444)",
+    paddingBottom: "1.5rem"
+  },
+  pageTitle: {
+    fontSize: "1.8rem",
+    fontWeight: "700",
+    marginBottom: "0.5rem",
+    color: "var(--text-primary, #ffffff)",
+    margin: 0
+  },
+  pageSubtitle: {
+    color: "var(--text-secondary, #aaaaaa)",
+    fontSize: "0.95rem",
+    marginTop: "0.5rem"
+  },
+  sectionTitle: {
+    fontSize: "1.2rem",
+    fontWeight: "600",
+    color: "#5a9fd1",
+    margin: 0
+  },
+  gridContainer: {
+    display: "grid",
+    // 화면이 좁아지면 자동으로 줄바꿈되도록 개선 (최소 너비 350px)
+    gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+    gap: "1.5rem",
+  },
+  card: {
+    backgroundColor: "var(--bg-secondary, #2b2d31)",
+    borderRadius: "12px",
+    border: "1px solid var(--border-color, #444)",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+    height: "320px", // 카드 높이 고정
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  },
+  cardHeader: {
+    padding: "0.75rem 1rem",
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    borderBottom: "1px solid #444",
+    fontSize: "0.9rem",
+    fontWeight: "600",
+    color: "#ddd"
+  },
+  iframeWrapper: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    position: "relative",
+    overflow: "hidden",
+    backgroundColor: "var(--bg-secondary, #2b2d31)",
+  },
+  iframe: {
+    width: "100%",
+    height: "100%",
+    border: "none",
+    display: "block",
+    backgroundColor: "transparent",
+  }
+};

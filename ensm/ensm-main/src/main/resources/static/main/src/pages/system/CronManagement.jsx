@@ -2,12 +2,15 @@ import React, { useState, useEffect, useMemo } from "react";
 import SettingItem from "../../components/SettingItem";
 import { apiFetch } from '../../utils/api';
 
+// Settings 컴포넌트와 통일된 스타일 적용
 export default function CronManagement() {
+  // =================================================================
+  // Logic Section (기존 로직 100% 유지)
+  // =================================================================
   const [user, setUser] = useState("root");
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [newSchedule, setNewSchedule] = useState("");
-  const [newCommand, setNewCommand] = useState("");
+  const [newCommand, setNewCommand] = useState(""); // newSchedule은 사용되지 않아 제거(generateCronSchedule로 대체됨)
   const [message, setMessage] = useState("");
 
   // CRON 스케줄 구성 요소
@@ -193,413 +196,268 @@ export default function CronManagement() {
     }
   };
 
+  // =================================================================
+  // UI Render Section (새로운 스타일 적용)
+  // =================================================================
+
   return (
-    <div style={{ padding: "2rem", backgroundColor: "#1e1e1e", minHeight: "100vh", color: "white" }}>
-      <h2 style={{ fontSize: "1.5rem", marginBottom: "1.5rem" }}>⏰ CRON 작업 관리</h2>
+    <div style={styles.pageContainer}>
+      <header style={styles.header}>
+        <h2 style={styles.pageTitle}>CRON 작업 관리</h2>
+        <p style={styles.pageSubtitle}>서버의 반복 작업을 스케줄링하고 관리합니다.</p>
+      </header>
 
-      <div style={{ marginBottom: "1.5rem" }}>
-        <label style={{ marginRight: "1rem" }}>사용자:</label>
-        <input
-          type="text"
-          value={user}
-          onChange={(e) => setUser(e.target.value)}
-          style={{
-            padding: "0.5rem",
-            backgroundColor: "#2b2d31",
-            border: "1px solid #444",
-            borderRadius: "4px",
-            color: "white"
-          }}
-        />
-        <button
-          onClick={loadCronJobs}
-          style={{
-            marginLeft: "1rem",
-            padding: "0.5rem 1rem",
-            backgroundColor: "#5865f2",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
-        >
-          새로고침
-        </button>
-      </div>
-
+      {/* 메시지 알림 박스 */}
       {message && (
         <div style={{
-          padding: "0.75rem",
-          marginBottom: "1rem",
-          borderRadius: "4px",
-          backgroundColor: message.includes("실패") ? "#3a1a1a" : "#1a3a1a",
-          color: message.includes("실패") ? "#ff6666" : "#66ff66"
+          ...styles.messageBox,
+          backgroundColor: message.includes("실패") ? "rgba(220, 38, 38, 0.2)" : "rgba(16, 185, 129, 0.2)",
+          borderColor: message.includes("실패") ? "#ef4444" : "#10b981",
+          color: message.includes("실패") ? "#fca5a5" : "#6ee7b7",
         }}>
           {message}
         </div>
       )}
 
-      <div style={{ backgroundColor: "#2b2d31", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>새 CRON 작업 추가</h3>
-        
-        {/* 스케줄 설정 */}
-        <div style={{ marginBottom: "1.5rem" }}>
-          <h4 style={{ fontSize: "1rem", marginBottom: "1rem", color: "#aaa" }}>⏰ 실행 스케줄 설정</h4>
+      <div style={styles.gridContainer}>
+        {/* 1. 제어 패널 (사용자 선택 및 새로고침) */}
+        {/* 1. 제어 패널 (수정됨: 크기 확대 및 줄바꿈 방지) */}
+        <section style={styles.card}>
+          <h3 style={styles.cardTitle}>관리 대상 설정</h3>
           
-          {/* 분 */}
-          <div style={{ marginBottom: "1rem", padding: "1rem", backgroundColor: "#1e1e1e", borderRadius: "4px" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "500" }}>분 (0-59)</label>
-            <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="minute-every"
-                  name="minute-type"
-                  checked={scheduleConfig.minute.type === "every"}
-                  onChange={() => handleScheduleChange("minute", "every", "*")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="minute-every" style={{ cursor: "pointer" }}>마다</label>
-              </div>
-              {scheduleConfig.minute.type === "every" && (
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                  <span>매</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max="59"
-                    value={scheduleConfig.minute.value === "*" || !scheduleConfig.minute.value ? "" : scheduleConfig.minute.value.replace("*/", "")}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      handleScheduleChange("minute", "every", val ? val : "*");
-                    }}
-                    placeholder="매번"
-                    style={{
-                      width: "80px",
-                      padding: "0.5rem",
-                      backgroundColor: "#2b2d31",
-                      border: "1px solid #444",
-                      borderRadius: "4px",
-                      color: "white"
-                    }}
-                  />
-                  <span>분</span>
-                  {(scheduleConfig.minute.value === "*" || !scheduleConfig.minute.value) && <span style={{ color: "#888" }}>(매번)</span>}
-                </div>
-              )}
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="minute-specific"
-                  name="minute-type"
-                  checked={scheduleConfig.minute.type === "specific"}
-                  onChange={() => handleScheduleChange("minute", "specific", "0")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="minute-specific" style={{ cursor: "pointer" }}>특정</label>
-              </div>
-              {scheduleConfig.minute.type === "specific" && (
-                <input
-                  type="number"
-                  min="0"
-                  max="59"
-                  value={scheduleConfig.minute.value}
-                  onChange={(e) => handleScheduleChange("minute", "specific", e.target.value)}
-                  placeholder="0"
-                  style={{
-                    width: "80px",
-                    padding: "0.5rem",
-                    backgroundColor: "#2b2d31",
-                    border: "1px solid #444",
-                    borderRadius: "4px",
-                    color: "white"
-                  }}
-                />
-              )}
+          <div style={styles.controlPanelRow}>
+            {/* 라벨과 입력창을 감싸는 컨테이너 */}
+            <div style={styles.inputGroup}>
+              <label style={styles.customLabel}>
+                대상 사용자
+                {/* 툴팁 아이콘 느낌 (선택사항) */}
+                <span title="CRON 작업을 조회할 리눅스 사용자 계정" style={{marginLeft: '0.5rem', cursor: 'help', opacity: 0.7}}></span>
+              </label>
+              <input
+                type="text"
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
+                style={styles.largeInput} // 커진 입력창 스타일 적용
+                placeholder="root"
+              />
+              
             </div>
-          </div>
 
-          {/* 시 */}
-          <div style={{ marginBottom: "1rem", padding: "1rem", backgroundColor: "#1e1e1e", borderRadius: "4px" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "500" }}>시 (0-23)</label>
-            <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="hour-every"
-                  name="hour-type"
-                  checked={scheduleConfig.hour.type === "every"}
-                  onChange={() => handleScheduleChange("hour", "every", "*")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="hour-every" style={{ cursor: "pointer" }}>마다</label>
-              </div>
-              {scheduleConfig.hour.type === "every" && (
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                  <span>매</span>
+            {/* 새로고침 버튼 */}
+            <button 
+              onClick={loadCronJobs}
+              style={styles.largeButton} // 커진 버튼 스타일 적용
+            >
+              새로고침
+            </button>
+          </div>
+        </section>
+
+        {/* 2. 새 작업 추가 카드 */}
+        <section style={{ ...styles.card, gridColumn: "1 / -1" }}>
+          <h3 style={styles.cardTitle}>새 스케줄 추가</h3>
+          
+          <div style={styles.scheduleGrid}>
+            {/* 분 설정 */}
+            <div style={styles.scheduleItem}>
+              <label style={styles.scheduleLabel}>분 (Minute)</label>
+              <div style={styles.radioGroup}>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.minute.type === "every"}
+                    onChange={() => handleScheduleChange("minute", "every", "*")}
+                  />
+                  <span>매분</span>
+                </label>
+                {scheduleConfig.minute.type === "every" && (
+                   <input
+                     type="number"
+                     min="1" max="59"
+                     value={scheduleConfig.minute.value === "*" ? "" : scheduleConfig.minute.value.replace("*/", "")}
+                     onChange={(e) => handleScheduleChange("minute", "every", e.target.value ? e.target.value : "*")}
+                     placeholder="*"
+                     style={styles.smallInput}
+                   />
+                )}
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.minute.type === "specific"}
+                    onChange={() => handleScheduleChange("minute", "specific", "0")}
+                  />
+                  <span>특정</span>
+                </label>
+                {scheduleConfig.minute.type === "specific" && (
                   <input
                     type="number"
-                    min="1"
-                    max="23"
-                    value={scheduleConfig.hour.value === "*" || !scheduleConfig.hour.value ? "" : scheduleConfig.hour.value.replace("*/", "")}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      handleScheduleChange("hour", "every", val ? val : "*");
-                    }}
-                    placeholder="매번"
-                    style={{
-                      width: "80px",
-                      padding: "0.5rem",
-                      backgroundColor: "#2b2d31",
-                      border: "1px solid #444",
-                      borderRadius: "4px",
-                      color: "white"
-                    }}
+                    min="0" max="59"
+                    value={scheduleConfig.minute.value}
+                    onChange={(e) => handleScheduleChange("minute", "specific", e.target.value)}
+                    style={styles.smallInput}
                   />
-                  <span>시</span>
-                  {(scheduleConfig.hour.value === "*" || !scheduleConfig.hour.value) && <span style={{ color: "#888" }}>(매번)</span>}
-                </div>
-              )}
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="hour-specific"
-                  name="hour-type"
-                  checked={scheduleConfig.hour.type === "specific"}
-                  onChange={() => handleScheduleChange("hour", "specific", "0")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="hour-specific" style={{ cursor: "pointer" }}>특정</label>
+                )}
               </div>
-              {scheduleConfig.hour.type === "specific" && (
-                <input
-                  type="number"
-                  min="0"
-                  max="23"
-                  value={scheduleConfig.hour.value}
-                  onChange={(e) => handleScheduleChange("hour", "specific", e.target.value)}
-                  placeholder="0"
-                  style={{
-                    width: "80px",
-                    padding: "0.5rem",
-                    backgroundColor: "#2b2d31",
-                    border: "1px solid #444",
-                    borderRadius: "4px",
-                    color: "white"
-                  }}
-                />
-              )}
             </div>
-          </div>
 
-          {/* 일 */}
-          <div style={{ marginBottom: "1rem", padding: "1rem", backgroundColor: "#1e1e1e", borderRadius: "4px" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "500" }}>일 (1-31)</label>
-            <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="day-every"
-                  name="day-type"
-                  checked={scheduleConfig.day.type === "every"}
-                  onChange={() => handleScheduleChange("day", "every", "*")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="day-every" style={{ cursor: "pointer" }}>마다</label>
-              </div>
-              {scheduleConfig.day.type === "every" && (
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                  <span>매</span>
+            {/* 시 설정 */}
+            <div style={styles.scheduleItem}>
+              <label style={styles.scheduleLabel}>시 (Hour)</label>
+              <div style={styles.radioGroup}>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.hour.type === "every"}
+                    onChange={() => handleScheduleChange("hour", "every", "*")}
+                  />
+                  <span>매시</span>
+                </label>
+                {scheduleConfig.hour.type === "every" && (
+                   <input
+                     type="number"
+                     min="1" max="23"
+                     value={scheduleConfig.hour.value === "*" ? "" : scheduleConfig.hour.value.replace("*/", "")}
+                     onChange={(e) => handleScheduleChange("hour", "every", e.target.value ? e.target.value : "*")}
+                     placeholder="*"
+                     style={styles.smallInput}
+                   />
+                )}
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.hour.type === "specific"}
+                    onChange={() => handleScheduleChange("hour", "specific", "0")}
+                  />
+                  <span>특정</span>
+                </label>
+                {scheduleConfig.hour.type === "specific" && (
                   <input
                     type="number"
-                    min="1"
-                    max="31"
-                    value={scheduleConfig.day.value === "*" || !scheduleConfig.day.value ? "" : scheduleConfig.day.value.replace("*/", "")}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      handleScheduleChange("day", "every", val ? val : "*");
-                    }}
-                    placeholder="매번"
-                    style={{
-                      width: "80px",
-                      padding: "0.5rem",
-                      backgroundColor: "#2b2d31",
-                      border: "1px solid #444",
-                      borderRadius: "4px",
-                      color: "white"
-                    }}
+                    min="0" max="23"
+                    value={scheduleConfig.hour.value}
+                    onChange={(e) => handleScheduleChange("hour", "specific", e.target.value)}
+                    style={styles.smallInput}
                   />
-                  <span>일</span>
-                  {(scheduleConfig.day.value === "*" || !scheduleConfig.day.value) && <span style={{ color: "#888" }}>(매번)</span>}
-                </div>
-              )}
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="day-specific"
-                  name="day-type"
-                  checked={scheduleConfig.day.type === "specific"}
-                  onChange={() => handleScheduleChange("day", "specific", "1")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="day-specific" style={{ cursor: "pointer" }}>특정</label>
+                )}
               </div>
-              {scheduleConfig.day.type === "specific" && (
-                <input
-                  type="number"
-                  min="1"
-                  max="31"
-                  value={scheduleConfig.day.value}
-                  onChange={(e) => handleScheduleChange("day", "specific", e.target.value)}
-                  placeholder="1"
-                  style={{
-                    width: "80px",
-                    padding: "0.5rem",
-                    backgroundColor: "#2b2d31",
-                    border: "1px solid #444",
-                    borderRadius: "4px",
-                    color: "white"
-                  }}
-                />
-              )}
             </div>
-          </div>
 
-          {/* 월 */}
-          <div style={{ marginBottom: "1rem", padding: "1rem", backgroundColor: "#1e1e1e", borderRadius: "4px" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "500" }}>월 (1-12)</label>
-            <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="month-every"
-                  name="month-type"
-                  checked={scheduleConfig.month.type === "every"}
-                  onChange={() => handleScheduleChange("month", "every", "*")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="month-every" style={{ cursor: "pointer" }}>마다</label>
-              </div>
-              {scheduleConfig.month.type === "every" && (
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                  <span>매</span>
+            {/* 일 설정 */}
+            <div style={styles.scheduleItem}>
+              <label style={styles.scheduleLabel}>일 (Day)</label>
+              <div style={styles.radioGroup}>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.day.type === "every"}
+                    onChange={() => handleScheduleChange("day", "every", "*")}
+                  />
+                  <span>매일</span>
+                </label>
+                {scheduleConfig.day.type === "every" && (
+                   <input
+                     type="number"
+                     min="1" max="31"
+                     value={scheduleConfig.day.value === "*" ? "" : scheduleConfig.day.value.replace("*/", "")}
+                     onChange={(e) => handleScheduleChange("day", "every", e.target.value ? e.target.value : "*")}
+                     placeholder="*"
+                     style={styles.smallInput}
+                   />
+                )}
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.day.type === "specific"}
+                    onChange={() => handleScheduleChange("day", "specific", "1")}
+                  />
+                  <span>특정</span>
+                </label>
+                {scheduleConfig.day.type === "specific" && (
                   <input
                     type="number"
-                    min="1"
-                    max="12"
-                    value={scheduleConfig.month.value === "*" || !scheduleConfig.month.value ? "" : scheduleConfig.month.value.replace("*/", "")}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      handleScheduleChange("month", "every", val ? val : "*");
-                    }}
-                    placeholder="매번"
-                    style={{
-                      width: "80px",
-                      padding: "0.5rem",
-                      backgroundColor: "#2b2d31",
-                      border: "1px solid #444",
-                      borderRadius: "4px",
-                      color: "white"
-                    }}
+                    min="1" max="31"
+                    value={scheduleConfig.day.value}
+                    onChange={(e) => handleScheduleChange("day", "specific", e.target.value)}
+                    style={styles.smallInput}
                   />
-                  <span>월</span>
-                  {(scheduleConfig.month.value === "*" || !scheduleConfig.month.value) && <span style={{ color: "#888" }}>(매번)</span>}
-                </div>
-              )}
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="month-specific"
-                  name="month-type"
-                  checked={scheduleConfig.month.type === "specific"}
-                  onChange={() => handleScheduleChange("month", "specific", "1")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="month-specific" style={{ cursor: "pointer" }}>특정</label>
+                )}
               </div>
-              {scheduleConfig.month.type === "specific" && (
-                <input
-                  type="number"
-                  min="1"
-                  max="12"
-                  value={scheduleConfig.month.value}
-                  onChange={(e) => handleScheduleChange("month", "specific", e.target.value)}
-                  placeholder="1"
-                  style={{
-                    width: "80px",
-                    padding: "0.5rem",
-                    backgroundColor: "#2b2d31",
-                    border: "1px solid #444",
-                    borderRadius: "4px",
-                    color: "white"
-                  }}
-                />
-              )}
             </div>
-          </div>
 
-          {/* 요일 */}
-          <div style={{ marginBottom: "1rem", padding: "1rem", backgroundColor: "#1e1e1e", borderRadius: "4px" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "500" }}>요일 (0-7, 0과 7은 일요일)</label>
-            <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="weekday-every"
-                  name="weekday-type"
-                  checked={scheduleConfig.weekday.type === "every"}
-                  onChange={() => handleScheduleChange("weekday", "every", "*")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="weekday-every" style={{ cursor: "pointer" }}>마다</label>
-              </div>
-              {scheduleConfig.weekday.type === "every" && (
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                  <span>매</span>
+            {/* 월 설정 */}
+            <div style={styles.scheduleItem}>
+              <label style={styles.scheduleLabel}>월 (Month)</label>
+              <div style={styles.radioGroup}>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.month.type === "every"}
+                    onChange={() => handleScheduleChange("month", "every", "*")}
+                  />
+                  <span>매월</span>
+                </label>
+                {scheduleConfig.month.type === "every" && (
+                   <input
+                     type="number"
+                     min="1" max="12"
+                     value={scheduleConfig.month.value === "*" ? "" : scheduleConfig.month.value.replace("*/", "")}
+                     onChange={(e) => handleScheduleChange("month", "every", e.target.value ? e.target.value : "*")}
+                     placeholder="*"
+                     style={styles.smallInput}
+                   />
+                )}
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.month.type === "specific"}
+                    onChange={() => handleScheduleChange("month", "specific", "1")}
+                  />
+                  <span>특정</span>
+                </label>
+                {scheduleConfig.month.type === "specific" && (
                   <input
                     type="number"
-                    min="1"
-                    max="7"
-                    value={scheduleConfig.weekday.value === "*" || !scheduleConfig.weekday.value ? "" : scheduleConfig.weekday.value.replace("*/", "")}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      handleScheduleChange("weekday", "every", val ? val : "*");
-                    }}
-                    placeholder="매번"
-                    style={{
-                      width: "80px",
-                      padding: "0.5rem",
-                      backgroundColor: "#2b2d31",
-                      border: "1px solid #444",
-                      borderRadius: "4px",
-                      color: "white"
-                    }}
+                    min="1" max="12"
+                    value={scheduleConfig.month.value}
+                    onChange={(e) => handleScheduleChange("month", "specific", e.target.value)}
+                    style={styles.smallInput}
                   />
-                  <span>요일</span>
-                  {(scheduleConfig.weekday.value === "*" || !scheduleConfig.weekday.value) && <span style={{ color: "#888" }}>(매번)</span>}
-                </div>
-              )}
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                <input
-                  type="radio"
-                  id="weekday-specific"
-                  name="weekday-type"
-                  checked={scheduleConfig.weekday.type === "specific"}
-                  onChange={() => handleScheduleChange("weekday", "specific", "0")}
-                  style={{ cursor: "pointer" }}
-                />
-                <label htmlFor="weekday-specific" style={{ cursor: "pointer" }}>특정</label>
+                )}
               </div>
+            </div>
+
+            {/* 요일 설정 (전체 너비 사용) */}
+            <div style={{ ...styles.scheduleItem, gridColumn: "1 / -1" }}>
+              <label style={styles.scheduleLabel}>요일 (Weekday)</label>
+              <div style={styles.radioGroup}>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.weekday.type === "every"}
+                    onChange={() => handleScheduleChange("weekday", "every", "*")}
+                  />
+                  <span>매일(요일무관)</span>
+                </label>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    checked={scheduleConfig.weekday.type === "specific"}
+                    onChange={() => handleScheduleChange("weekday", "specific", "0")}
+                  />
+                  <span>요일 지정</span>
+                </label>
+              </div>
+              
               {scheduleConfig.weekday.type === "specific" && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginTop: "0.5rem" }}>
+                <div style={styles.weekdayContainer}>
                   {[
-                    { value: "0", label: "일요일 (0)" },
-                    { value: "1", label: "월요일 (1)" },
-                    { value: "2", label: "화요일 (2)" },
-                    { value: "3", label: "수요일 (3)" },
-                    { value: "4", label: "목요일 (4)" },
-                    { value: "5", label: "금요일 (5)" },
-                    { value: "6", label: "토요일 (6)" }
+                    { value: "0", label: "일" },
+                    { value: "1", label: "월" },
+                    { value: "2", label: "화" },
+                    { value: "3", label: "수" },
+                    { value: "4", label: "목" },
+                    { value: "5", label: "금" },
+                    { value: "6", label: "토" }
                   ].map(day => {
                     const currentValue = scheduleConfig.weekday.value;
                     let isChecked = false;
@@ -608,30 +466,19 @@ export default function CronManagement() {
                     } else if (typeof currentValue === "string" && currentValue !== "*" && currentValue !== "") {
                       isChecked = currentValue.split(",").map(d => d.trim()).includes(day.value);
                     }
-                    
                     return (
-                      <label
+                      <div 
                         key={day.value}
+                        onClick={() => handleWeekdayToggle(day.value)}
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          cursor: "pointer",
-                          padding: "0.4rem 0.6rem",
+                          ...styles.weekdayChip,
                           backgroundColor: isChecked ? "#5865f2" : "#2b2d31",
-                          border: `1px solid ${isChecked ? "#5865f2" : "#444"}`,
-                          borderRadius: "4px",
-                          transition: "all 0.2s"
+                          borderColor: isChecked ? "#5865f2" : "#444",
+                          color: isChecked ? "white" : "#ccc"
                         }}
                       >
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => handleWeekdayToggle(day.value)}
-                          style={{ cursor: "pointer" }}
-                        />
-                        <span style={{ fontSize: "0.9rem" }}>{day.label}</span>
-                      </label>
+                        {day.label}
+                      </div>
                     );
                   })}
                 </div>
@@ -639,109 +486,341 @@ export default function CronManagement() {
             </div>
           </div>
 
-          {/* 생성된 CRON 스케줄 미리보기 */}
-          <div style={{ 
-            marginTop: "1rem", 
-            padding: "0.75rem", 
-            backgroundColor: "#313338", 
-            borderRadius: "4px",
-            border: "1px solid #444"
-          }}>
-            <div style={{ fontSize: "0.9rem", color: "#aaa", marginBottom: "0.5rem" }}>생성된 CRON 스케줄:</div>
-            <div style={{ 
-              fontFamily: "monospace", 
-              fontSize: "1rem", 
-              color: "#4ade80",
-              fontWeight: "500"
-            }}>
-              {generateCronSchedule}
+          {/* 미리보기 및 명령어 입력 */}
+          <div style={styles.previewBox}>
+            <span style={{ color: "#aaa" }}>CRON Expression:</span>
+            <span style={styles.cronExpression}>{generateCronSchedule}</span>
+          </div>
+
+          <div style={{ marginTop: "1.5rem" }}>
+            <SettingItem
+              label="실행 명령어"
+              menu="cron"
+              input={
+                <input
+                  type="text"
+                  value={newCommand}
+                  onChange={(e) => setNewCommand(e.target.value)}
+                  placeholder="/usr/bin/python3 /home/user/backup.py"
+                  style={styles.input}
+                />
+              }
+              hint="실행할 스크립트나 명령어의 절대 경로를 입력하세요."
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+              <button onClick={handleAdd} style={styles.button}>
+                + 스케줄 등록
+              </button>
             </div>
           </div>
-        </div>
-        <SettingItem
-          label="명령어"
-          menu="cron"
-          input={
-            <input
-              type="text"
-              value={newCommand}
-              onChange={(e) => setNewCommand(e.target.value)}
-              placeholder="/usr/bin/command"
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                backgroundColor: "#1e1e1e",
-                border: "1px solid #444",
-                borderRadius: "4px",
-                color: "white"
-              }}
-            />
-          }
-          hint="실행할 명령어 또는 스크립트의 전체 경로를 지정합니다."
-          description="실행 명령어"
-        />
-        <button
-          onClick={handleAdd}
-          style={{
-            padding: "0.75rem 2rem",
-            backgroundColor: "#5865f2",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            marginTop: "1rem"
-          }}
-        >
-          추가
-        </button>
-      </div>
+        </section>
 
-      <div style={{ backgroundColor: "#2b2d31", padding: "1.5rem", borderRadius: "8px" }}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>현재 CRON 작업 목록</h3>
-        {loading ? (
-          <p>로딩 중...</p>
-        ) : jobs.length === 0 ? (
-          <p>등록된 CRON 작업이 없습니다.</p>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid #444" }}>
-                <th style={{ padding: "0.75rem", textAlign: "left" }}>스케줄</th>
-                <th style={{ padding: "0.75rem", textAlign: "left" }}>작업</th>
-                <th style={{ padding: "0.75rem", textAlign: "right" }}>액션</th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.map((job, index) => {
-                const parts = job.schedule ? job.schedule.split(/\s+/, 6) : [];
-                const schedule = parts.length >= 5 ? parts.slice(0, 5).join(" ") : "";
-                const command = parts.length >= 6 ? parts.slice(5).join(" ") : job.schedule || "";
-                return (
-                <tr key={index} style={{ borderBottom: "1px solid #333" }}>
-                  <td style={{ padding: "0.75rem" }}>{schedule}</td>
-                  <td style={{ padding: "0.75rem" }}>{command}</td>
-                  <td style={{ padding: "0.75rem", textAlign: "right" }}>
-                    <button
-                      onClick={() => handleDelete(index)}
-                      style={{
-                        padding: "0.5rem 1rem",
-                        backgroundColor: "#dc2626",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer"
-                      }}
-                    >
-                      삭제
-                    </button>
-                  </td>
-                </tr>
-              );
-              })}
-            </tbody>
-          </table>
-        )}
+        {/* 3. 현재 작업 목록 카드 */}
+        <section style={{ ...styles.card, gridColumn: "1 / -1" }}>
+          <h3 style={styles.cardTitle}>등록된 CRON 작업 ({jobs.length})</h3>
+          {loading ? (
+            <div style={styles.loadingText}>데이터를 불러오는 중...</div>
+          ) : jobs.length === 0 ? (
+            <div style={styles.emptyState}>등록된 작업이 없습니다.</div>
+          ) : (
+            <div style={styles.tableContainer}>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>스케줄 (Schedule)</th>
+                    <th style={styles.th}>명령어 (Command)</th>
+                    <th style={{...styles.th, textAlign: 'right'}}>관리</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {jobs.map((job, index) => {
+                    const parts = job.schedule ? job.schedule.split(/\s+/, 6) : [];
+                    const scheduleStr = parts.length >= 5 ? parts.slice(0, 5).join(" ") : "";
+                    const commandStr = parts.length >= 6 ? parts.slice(5).join(" ") : job.schedule || "";
+                    
+                    return (
+                      <tr key={index} style={styles.tr}>
+                        <td style={styles.td}>
+                          <span style={styles.cronTag}>{scheduleStr}</span>
+                        </td>
+                        <td style={{...styles.td, color: '#ddd'}}>{commandStr}</td>
+                        <td style={{...styles.td, textAlign: 'right'}}>
+                          <button
+                            onClick={() => handleDelete(index)}
+                            style={styles.deleteButton}
+                          >
+                            삭제
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
 }
+
+// ==========================================
+// Styles Object (Settings 컴포넌트와 통일)
+// ==========================================
+const styles = {
+  pageContainer: {
+    padding: "2rem max(2rem, 5vw)",
+    backgroundColor: "var(--bg-primary, #1e1e1e)",
+    minHeight: "100vh",
+    color: "var(--text-primary, #ffffff)",
+    fontFamily: "'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+  },
+  header: {
+    marginBottom: "2.5rem",
+    borderBottom: "1px solid var(--border-color, #444)",
+    paddingBottom: "1.5rem"
+  },
+  pageTitle: {
+    fontSize: "1.8rem",
+    fontWeight: "700",
+    marginBottom: "0.5rem",
+    color: "var(--text-primary, #ffffff)"
+  },
+  pageSubtitle: {
+    color: "var(--text-secondary, #aaaaaa)",
+    fontSize: "0.95rem"
+  },
+  messageBox: {
+    padding: "1rem",
+    marginBottom: "2rem",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontWeight: "500",
+    animation: "slideDown 0.3s ease-out"
+  },
+  gridContainer: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+    gap: "1.5rem",
+    marginBottom: "3rem"
+  },
+  card: {
+    backgroundColor: "var(--bg-secondary, #2b2d31)",
+    padding: "1.5rem",
+    borderRadius: "12px",
+    border: "1px solid var(--border-color, #444)",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    display: "flex",
+    flexDirection: "column",
+  },
+  cardTitle: {
+    fontSize: "1.1rem",
+    fontWeight: "600",
+    color: "#5a9fd1",
+    marginBottom: "1.5rem",
+    paddingBottom: "0.75rem",
+    borderBottom: "1px solid var(--border-color, #444)"
+  },
+  input: {
+    width: "95%",
+    padding: "0.75rem",
+    backgroundColor: "var(--bg-primary, #1e1e1e)",
+    border: "1px solid #555",
+    borderRadius: "6px",
+    color: "var(--text-primary, #fff)",
+    fontSize: "0.9rem",
+    outline: "none",
+  },
+  button: {
+    padding: "0.85rem 1.5rem",
+    backgroundColor: "#5865f2",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600",
+    transition: "background-color 0.2s",
+  },
+  refreshButton: {
+    marginTop: '1.5rem', // SettingItem의 label 높이 보정
+    padding: "0.75rem 1rem",
+  },
+  
+  // Schedule Specific Styles
+  scheduleGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "1.5rem",
+    marginBottom: "1.5rem"
+  },
+  scheduleItem: {
+    backgroundColor: "rgba(0,0,0,0.2)",
+    padding: "1rem",
+    borderRadius: "8px",
+    border: "1px solid #444"
+  },
+  scheduleLabel: {
+    display: "block",
+    marginBottom: "0.8rem",
+    fontWeight: "600",
+    color: "#ddd",
+    fontSize: "0.9rem"
+  },
+  radioGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem"
+  },
+  radioLabel: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    cursor: "pointer",
+    fontSize: "0.9rem",
+    color: "#ccc"
+  },
+  smallInput: {
+    width: "60px",
+    padding: "0.3rem",
+    backgroundColor: "#1e1e1e",
+    border: "1px solid #555",
+    borderRadius: "4px",
+    color: "white",
+    marginLeft: "1.5rem",
+    fontSize: "0.85rem"
+  },
+  weekdayContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "0.5rem",
+    marginTop: "0.5rem"
+  },
+  weekdayChip: {
+    padding: "0.4rem 0.8rem",
+    border: "1px solid #444",
+    borderRadius: "20px",
+    cursor: "pointer",
+    fontSize: "0.85rem",
+    transition: "all 0.2s",
+    userSelect: "none"
+  },
+  previewBox: {
+    backgroundColor: "#1e1e1e",
+    padding: "1rem",
+    borderRadius: "6px",
+    border: "1px solid #444",
+    display: "flex",
+    alignItems: "center",
+    gap: "1rem",
+    fontFamily: "monospace"
+  },
+  cronExpression: {
+    color: "#4ade80",
+    fontWeight: "bold",
+    fontSize: "1.1rem"
+  },
+  
+  // List & Table Styles
+  emptyState: {
+    padding: "3rem",
+    textAlign: "center",
+    color: "#666",
+    backgroundColor: "rgba(0,0,0,0.1)",
+    borderRadius: "8px",
+    border: "1px dashed #444"
+  },
+  loadingText: {
+    textAlign: "center", 
+    padding: "2rem", 
+    color: "#aaa"
+  },
+  // ... 기존 스타일 아래에 추가 ...
+
+  // 1. 제어 패널용 전용 스타일 (글자 잘림 해결 & 크기 확대)
+  controlPanelRow: {
+    display: 'flex',
+    alignItems: 'flex-end', // 버튼과 입력창 바닥 라인 맞춤
+    gap: '1rem',
+    flexWrap: 'wrap', // 화면이 너무 좁으면 버튼이 아래로 내려가도록
+  },
+  inputGroup: {
+    flex: 1, // 남은 공간을 입력창이 다 차지하도록
+    minWidth: '250px', // 최소 너비 보장
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem', // 라벨과 입력창 사이 간격
+  },
+  customLabel: {
+    fontSize: '1rem', // 글자 크기 키움
+    fontWeight: '600',
+    color: '#ddd',
+    whiteSpace: 'nowrap', // ★ 핵심: 글자가 절대 줄바꿈되지 않음
+  },
+  largeInput: {
+    width: '90%',
+    padding: '0.9rem 1rem', // 패딩을 늘려 입력창을 통통하게 만듦
+    backgroundColor: 'var(--bg-primary, #1e1e1e)',
+    border: '1px solid #555',
+    borderRadius: '6px',
+    color: 'var(--text-primary, #fff)',
+    fontSize: '1rem', // 입력 글자도 시원하게
+    outline: 'none',
+    transition: 'border-color 0.2s',
+  },
+  largeButton: {
+    padding: '0.9rem 2rem', // 버튼도 입력창 높이에 맞춰 키움
+    backgroundColor: '#5865f2',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '1rem',
+    whiteSpace: 'nowrap', // 버튼 글자도 안 잘리게
+    boxShadow: '0 4px 6px rgba(0,0,0,0.2)', // 살짝 입체감 추가
+  },
+  tableContainer: {
+    overflowX: "auto"
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: "0.95rem"
+  },
+  th: {
+    textAlign: "left",
+    padding: "1rem",
+    color: "#aaa",
+    fontWeight: "600",
+    borderBottom: "1px solid #444",
+    whiteSpace: "nowrap"
+  },
+  tr: {
+    borderBottom: "1px solid #333",
+    transition: "background-color 0.2s"
+  },
+  td: {
+    padding: "1rem",
+    verticalAlign: "middle"
+  },
+  cronTag: {
+    display: "inline-block",
+    padding: "0.2rem 0.6rem",
+    backgroundColor: "rgba(90, 159, 209, 0.15)",
+    color: "#5a9fd1",
+    borderRadius: "4px",
+    fontFamily: "monospace",
+    fontSize: "0.9rem"
+  },
+  deleteButton: {
+    padding: "0.4rem 0.8rem",
+    backgroundColor: "transparent",
+    color: "#ef4444",
+    border: "1px solid #ef4444",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "0.8rem",
+    transition: "all 0.2s"
+  }
+};

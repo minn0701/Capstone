@@ -70,213 +70,277 @@ export default function SSHAutomation() {
   };
 
   return (
-    <div style={{ padding: "2rem", backgroundColor: "#1e1e1e", minHeight: "100vh", color: "white" }}>
-      <h2 style={{ fontSize: "1.5rem", marginBottom: "1.5rem" }}>🔐 SSH 자동화</h2>
+    <div style={styles.pageContainer}>
+      <header style={styles.header}>
+        <h2 style={styles.pageTitle}>SSH 자동화</h2>
+        <p style={styles.pageSubtitle}>
+          SSH 키 쌍을 생성하고 원격 서버에 공개키를 배포하여 비밀번호 없는 안전한 접속을 설정합니다.
+        </p>
+      </header>
 
       {message && (
         <div style={{
-          padding: "0.75rem",
-          marginBottom: "1.5rem",
-          borderRadius: "4px",
-          backgroundColor: message.includes("실패") ? "#3a1a1a" : "#1a3a1a",
-          color: message.includes("실패") ? "#ff6666" : "#66ff66"
+          ...styles.messageBox,
+          backgroundColor: message.includes("실패") ? "rgba(220, 38, 38, 0.2)" : "rgba(16, 185, 129, 0.2)",
+          borderColor: message.includes("실패") ? "#ef4444" : "#10b981",
+          color: message.includes("실패") ? "#fca5a5" : "#6ee7b7",
         }}>
           {message}
         </div>
       )}
 
-      <div style={{ backgroundColor: "#2b2d31", padding: "1.5rem", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>SSH 키 생성</h3>
-        <SettingItem
-          label="키 타입"
-          menu="ssh"
-          input={
-            <select
-              value={keyType}
-              onChange={(e) => setKeyType(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                backgroundColor: "#1e1e1e",
-                border: "1px solid #444",
-                borderRadius: "4px",
-                color: "white"
-              }}
-            >
-              <option value="rsa">RSA</option>
-              <option value="ed25519">ED25519</option>
-              <option value="ecdsa">ECDSA</option>
-            </select>
-          }
-          hint="SSH 키의 암호화 알고리즘 타입을 선택합니다. RSA는 호환성이 좋고, ED25519는 보안성이 높습니다."
-          description="암호화 알고리즘"
-        />
-        <SettingItem
-          label="키 크기"
-          menu="ssh"
-          input={
-            <input
-              type="number"
-              value={keySize}
-              onChange={(e) => setKeySize(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                backgroundColor: "#1e1e1e",
-                border: "1px solid #444",
-                borderRadius: "4px",
-                color: "white"
-              }}
-            />
-          }
-          hint="키의 비트 크기를 지정합니다. RSA는 2048 이상, ED25519는 크기 지정 불필요합니다."
-          description="키 비트 크기"
-        />
-        <SettingItem
-          label="주석"
-          menu="ssh"
-          input={
-            <input
-              type="text"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="user@hostname"
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                backgroundColor: "#1e1e1e",
-                border: "1px solid #444",
-                borderRadius: "4px",
-                color: "white"
-              }}
-            />
-          }
-          hint="키에 포함될 주석을 지정합니다. 일반적으로 user@hostname 형식을 사용합니다."
-          description="키 주석"
-        />
-        <button
-          onClick={handleGenerateKey}
-          disabled={loading}
-          style={{
-            padding: "0.75rem 2rem",
-            backgroundColor: loading ? "#555" : "#5865f2",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: loading ? "not-allowed" : "pointer",
-            marginTop: "1rem"
-          }}
-        >
-          {loading ? "생성 중..." : "키 생성"}
-        </button>
-      </div>
+      <div style={styles.gridContainer}>
+        {/* 섹션 1: SSH 키 생성 */}
+        <section style={styles.card}>
+          <h3 style={styles.cardTitle}>SSH 키 생성</h3>
+          
+          <SettingItem
+            label="키 알고리즘"
+            menu="ssh"
+            input={
+              <select
+                value={keyType}
+                onChange={(e) => setKeyType(e.target.value)}
+                style={styles.select}
+              >
+                <option value="rsa">RSA (호환성 우수)</option>
+                <option value="ed25519">ED25519 (보안/속도 우수)</option>
+                <option value="ecdsa">ECDSA</option>
+              </select>
+            }
+            hint="암호화 알고리즘을 선택합니다. 최신 시스템은 ED25519를 권장합니다."
+          />
 
-      <div style={{ backgroundColor: "#2b2d31", padding: "1.5rem", borderRadius: "8px" }}>
-        <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>SSH 키 복사</h3>
-        <SettingItem
-          label="공개키 경로"
-          menu="ssh"
-          input={
-            <input
-              type="text"
-              value={publicKeyPath}
-              onChange={(e) => setPublicKeyPath(e.target.value)}
-              placeholder="/tmp/id_rsa.pub"
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                backgroundColor: "#1e1e1e",
-                border: "1px solid #444",
-                borderRadius: "4px",
-                color: "white"
-              }}
-            />
-          }
-          hint="복사할 공개키 파일의 경로를 지정합니다. 일반적으로 ~/.ssh/id_rsa.pub 또는 ~/.ssh/id_ed25519.pub입니다."
-          description="공개키 파일 경로"
-        />
-        <SettingItem
-          label="사용자"
-          menu="ssh"
-          input={
-            <input
-              type="text"
-              value={sshUser}
-              onChange={(e) => setSshUser(e.target.value)}
-              placeholder="root"
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                backgroundColor: "#1e1e1e",
-                border: "1px solid #444",
-                borderRadius: "4px",
-                color: "white"
-              }}
-            />
-          }
-          hint="원격 서버의 사용자명을 지정합니다."
-          description="원격 사용자명"
-        />
-        <SettingItem
-          label="호스트"
-          menu="ssh"
-          input={
-            <input
-              type="text"
-              value={sshHost}
-              onChange={(e) => setSshHost(e.target.value)}
-              placeholder="192.168.1.100"
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                backgroundColor: "#1e1e1e",
-                border: "1px solid #444",
-                borderRadius: "4px",
-                color: "white"
-              }}
-            />
-          }
-          hint="원격 서버의 IP 주소 또는 호스트명을 지정합니다."
-          description="원격 호스트"
-        />
-        <SettingItem
-          label="포트"
-          menu="ssh"
-          input={
-            <input
-              type="number"
-              value={sshPort}
-              onChange={(e) => setSshPort(e.target.value)}
-              placeholder="22"
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                backgroundColor: "#1e1e1e",
-                border: "1px solid #444",
-                borderRadius: "4px",
-                color: "white"
-              }}
-            />
-          }
-          hint="SSH 서비스 포트 번호를 지정합니다. 기본값은 22입니다."
-          description="SSH 포트"
-        />
-        <button
-          onClick={handleCopyKey}
-          disabled={loading}
-          style={{
-            padding: "0.75rem 2rem",
-            backgroundColor: loading ? "#555" : "#5865f2",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: loading ? "not-allowed" : "pointer",
-            marginTop: "1rem"
-          }}
-        >
-          {loading ? "복사 중..." : "키 복사"}
-        </button>
+          <SettingItem
+            label="키 크기 (Bits)"
+            menu="ssh"
+            input={
+              <input
+                type="number"
+                value={keySize}
+                onChange={(e) => setKeySize(e.target.value)}
+                style={styles.input}
+                placeholder="2048"
+                disabled={keyType === 'ed25519'} // ED25519는 고정 크기
+              />
+            }
+            hint={keyType === 'ed25519' ? "ED25519는 고정 크기를 사용합니다." : "RSA의 경우 2048 또는 4096을 권장합니다."}
+          />
+
+          <SettingItem
+            label="주석 (Comment)"
+            menu="ssh"
+            input={
+              <input
+                type="text"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="user@hostname"
+                style={styles.input}
+              />
+            }
+            hint="키 식별을 위한 주석입니다. (예: email@example.com)"
+          />
+
+          <button
+            onClick={handleGenerateKey}
+            disabled={loading}
+            style={{
+              ...styles.primaryButton,
+              opacity: loading ? 0.7 : 1,
+              marginTop: "1.5rem",
+              width: "100%"
+            }}
+          >
+            {loading ? "키 생성 중..." : "SSH 키 생성하기"}
+          </button>
+        </section>
+
+        {/* 섹션 2: SSH 키 복사 */}
+        <section style={styles.card}>
+          <h3 style={styles.cardTitle}>SSH 키 배포 (Copy ID)</h3>
+          
+          <SettingItem
+            label="공개키 경로"
+            menu="ssh"
+            input={
+              <input
+                type="text"
+                value={publicKeyPath}
+                onChange={(e) => setPublicKeyPath(e.target.value)}
+                placeholder="/root/.ssh/id_rsa.pub"
+                style={styles.input}
+              />
+            }
+            hint="배포할 공개키(.pub) 파일의 절대 경로를 입력하세요."
+          />
+
+          {/* 수정된 부분: 가로 배치를 제거하고 세로로 배치하여 겹침 방지 */}
+          <SettingItem
+            label="원격 사용자"
+            menu="ssh"
+            input={
+                <input
+                type="text"
+                value={sshUser}
+                onChange={(e) => setSshUser(e.target.value)}
+                placeholder="root"
+                style={styles.input}
+                />
+            }
+            hint="접속할 원격 서버의 계정명입니다."
+          />
+        
+          <SettingItem
+            label="원격 호스트 IP"
+            menu="ssh"
+            input={
+                <input
+                type="text"
+                value={sshHost}
+                onChange={(e) => setSshHost(e.target.value)}
+                placeholder="192.168.1.100"
+                style={styles.input}
+                />
+            }
+            hint="접속할 원격 서버의 IP 주소 또는 도메인입니다."
+          />
+
+          <SettingItem
+            label="SSH 포트"
+            menu="ssh"
+            input={
+              <input
+                type="number"
+                value={sshPort}
+                onChange={(e) => setSshPort(e.target.value)}
+                placeholder="22"
+                style={styles.input}
+              />
+            }
+            hint="기본값: 22"
+          />
+
+          <button
+            onClick={handleCopyKey}
+            disabled={loading}
+            style={{
+              ...styles.successButton, // 구분감을 위해 다른 색상 사용
+              opacity: loading ? 0.7 : 1,
+              marginTop: "1.5rem",
+              width: "100%"
+            }}
+          >
+            {loading ? "배포 중..." : "원격 서버에 키 복사"}
+          </button>
+        </section>
       </div>
     </div>
   );
 }
+
+// ==========================================
+// Styles Object (CSS in JS) - Consistent Theme
+// ==========================================
+const styles = {
+  pageContainer: {
+    padding: "2rem max(2rem, 5vw)",
+    backgroundColor: "var(--bg-primary, #1e1e1e)",
+    minHeight: "100vh",
+    color: "var(--text-primary, #ffffff)",
+    fontFamily: "'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif",
+  },
+  header: {
+    marginBottom: "2.5rem",
+    borderBottom: "1px solid var(--border-color, #444)",
+    paddingBottom: "1.5rem"
+  },
+  pageTitle: {
+    fontSize: "1.8rem",
+    fontWeight: "700",
+    marginBottom: "0.5rem",
+    color: "var(--text-primary, #ffffff)",
+    margin: 0
+  },
+  pageSubtitle: {
+    color: "var(--text-secondary, #aaaaaa)",
+    fontSize: "0.95rem",
+    marginTop: "0.5rem"
+  },
+  messageBox: {
+    padding: "1rem",
+    marginBottom: "2rem",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontWeight: "500",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    animation: "slideDown 0.3s ease-out"
+  },
+  gridContainer: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))",
+    gap: "1.5rem",
+    marginBottom: "3rem"
+  },
+  card: {
+    backgroundColor: "var(--bg-secondary, #2b2d31)",
+    padding: "1.5rem",
+    borderRadius: "12px",
+    border: "1px solid var(--border-color, #444)",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    display: "flex",
+    flexDirection: "column",
+  },
+  cardTitle: {
+    fontSize: "1.1rem",
+    fontWeight: "600",
+    color: "#5a9fd1",
+    marginBottom: "1.5rem",
+    paddingBottom: "0.75rem",
+    borderBottom: "1px solid var(--border-color, #444)"
+  },
+  input: {
+    width: "95%",
+    padding: "0.75rem",
+    backgroundColor: "var(--bg-primary, #1e1e1e)",
+    border: "1px solid #555",
+    borderRadius: "6px",
+    color: "var(--text-primary, #fff)",
+    fontSize: "0.9rem",
+    outline: "none",
+    transition: "border-color 0.2s",
+  },
+  select: {
+    width: "100%",
+    padding: "0.75rem",
+    backgroundColor: "var(--bg-primary, #1e1e1e)",
+    border: "1px solid #555",
+    borderRadius: "6px",
+    color: "var(--text-primary, #fff)",
+    fontSize: "0.9rem",
+    outline: "none",
+    cursor: "pointer"
+  },
+  primaryButton: {
+    padding: "0.85rem",
+    backgroundColor: "#5865f2",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600",
+    transition: "background-color 0.2s",
+  },
+  successButton: {
+    padding: "0.85rem",
+    backgroundColor: "#10b981",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600",
+    transition: "background-color 0.2s",
+  }
+};
