@@ -341,6 +341,7 @@ chown -R ensm:ensm /opt/ensm
 chmod 644 /opt/ensm/*.jar 2>/dev/null || true
 chown -R ensm:ensm /etc/ensm
 chown -R ensm:ensm /var/log/ensm
+chmod -R 755 /var/log/ensm
 # 모든 스크립트를 ensm:ensm 소유로 설정
 chown -R ensm:ensm /usr/local/bin/ensm-scripts
 # run_script는 root 소유로 설정 (setuid wrapper이므로)
@@ -379,6 +380,41 @@ fi
 # 모든 쉘 스크립트를 ensm:ensm 소유, 700 권한으로 설정 (보안: 소유자만 접근 가능)
 # 단, run_script는 root:root로 유지해야 하므로 먼저 제외하고 설정
 chown -R ensm:ensm /usr/local/bin/ensm-scripts
+
+# ENSM 로그 디렉토리 권한 설정 (로그 파일 생성 가능하도록)
+mkdir -p /var/log/ensm/main /var/log/ensm/auth
+chown -R ensm:ensm /var/log/ensm
+chmod -R 755 /var/log/ensm
+
+# ENSM 설정 파일 생성 (로그 수준 설정 적용)
+mkdir -p /etc/ensm
+cat > /etc/ensm/application.properties <<'ENSM_CONFIG_EOF'
+# ENSM Main Application Configuration
+# 로그 파일 경로
+logging.file.name=/var/log/ensm/main/main-app.log
+# 로그 수준 설정
+logging.level.org.springframework.web=INFO
+logging.level.com.ensm=INFO
+# 로그 파일 롤링 설정
+logging.file.max-size=10MB
+logging.file.max-history=30
+ENSM_CONFIG_EOF
+
+cat > /etc/ensm/application-auth.properties <<'ENSM_AUTH_CONFIG_EOF'
+# ENSM Auth Application Configuration
+# 로그 파일 경로
+logging.file.name=/var/log/ensm/auth/auth-app.log
+# 로그 수준 설정
+logging.level.org.springframework.web=INFO
+logging.level.com.ensm=INFO
+# 로그 파일 롤링 설정
+logging.file.max-size=10MB
+logging.file.max-history=30
+ENSM_AUTH_CONFIG_EOF
+
+chown ensm:ensm /etc/ensm/application.properties /etc/ensm/application-auth.properties
+chmod 644 /etc/ensm/application.properties /etc/ensm/application-auth.properties
+echo "✅ ENSM 설정 파일 생성 완료: /etc/ensm/application.properties"
 
 # 범용 스크립트 실행 wrapper 컴파일 및 setuid 설정
 if [ -f /usr/local/bin/ensm-scripts/system/run_script.c ]; then
@@ -939,6 +975,20 @@ mkdir -p /etc/grafana/provisioning/datasources
 mkdir -p /etc/grafana/provisioning/dashboards
 mkdir -p /var/lib/grafana/dashboards
 
+# ENSM 설정 파일 생성
+if [ ! -f /etc/ensm/application.properties ]; then
+    cat > /etc/ensm/application.properties <<'ENSM_CONFIG_EOF'
+# ENSM 공통 설정
+# 로그 파일 경로는 환경 변수로 오버라이드 가능
+logging.file.name=${LOG_PATH_MAIN:/var/log/ensm/main/main-app.log}
+logging.level.org.springframework.web=INFO
+logging.level.com.ensm=INFO
+ENSM_CONFIG_EOF
+    chown ensm:ensm /etc/ensm/application.properties
+    chmod 644 /etc/ensm/application.properties
+    echo "✅ ENSM 설정 파일 생성: /etc/ensm/application.properties"
+fi
+
 # 데이터소스 자동 구성 (Prometheus, Loki)
 cat > /etc/grafana/provisioning/datasources/datasources.yaml <<'EOF'
 apiVersion: 1
@@ -1103,12 +1153,12 @@ cat > /var/lib/grafana/dashboards/system-monitor-gauge-logs.json <<'EOF'
     {
       "id": 4,
       "type": "logs",
-      "title": "System Logs (journald / varlogs)",
+      "title": "System Logs (journald / varlogs / ensm)",
       "gridPos": { "x": 0, "y": 8, "w": 24, "h": 12 },
       "targets": [
         {
           "datasource": { "type": "loki", "uid": null },
-          "expr": "{job=\"varlogs\"}",
+          "expr": "{job=~\"varlogs|ensm|journald\"}",
           "refId": "A"
         }
       ],

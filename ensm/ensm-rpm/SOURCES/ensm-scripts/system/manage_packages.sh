@@ -27,17 +27,11 @@ get_service_name() {
         "git")
             echo ""  # Git은 서비스가 없음
             ;;
-        "jellyfin")
-            echo "jellyfin"
-            ;;
         "plex")
             echo "plexmediaserver"
             ;;
         "home-assistant")
             echo "home-assistant"
-            ;;
-        "novnc")
-            echo ""  # noVNC는 서비스가 없을 수 있음
             ;;
         *)
             echo "$1"
@@ -60,13 +54,10 @@ get_rpm_package() {
             echo "nfs-utils"
             ;;
         "docker")
-            echo "docker docker-ce"
+            echo "docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
             ;;
         "git")
             echo "git"
-            ;;
-        "jellyfin")
-            echo "jellyfin"
             ;;
         "plex")
             echo "plexmediaserver"
@@ -74,11 +65,41 @@ get_rpm_package() {
         "home-assistant")
             echo "home-assistant"
             ;;
-        "novnc")
-            echo "novnc"
-            ;;
         *)
             echo "$1"
+            ;;
+    esac
+}
+
+# 패키지별 저장소 설정
+setup_repository() {
+    local pkg="$1"
+    
+    case "$pkg" in
+        "docker")
+            # dnf-plugins-core 설치 확인
+            if ! rpm -q dnf-plugins-core >/dev/null 2>&1; then
+                dnf -y install dnf-plugins-core 2>&1 || true
+            fi
+            # Docker 저장소 추가 (이미 있으면 스킵)
+            if [ ! -f /etc/yum.repos.d/docker-ce.repo ]; then
+                dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 2>&1 || true
+            fi
+            ;;
+        "plex")
+            # Plex 저장소 파일 생성 (RPM 설치 전에 필요)
+            if [ ! -f /etc/yum.repos.d/plex.repo ]; then
+                cat > /etc/yum.repos.d/plex.repo <<'PLEX_REPO_EOF'
+[PlexRepo]
+name=PlexRepo
+baseurl=https://downloads.plex.tv/repo/rpm/$basearch/
+enabled=1
+gpgkey=https://downloads.plex.tv/plex-keys/PlexSign.key
+gpgcheck=1
+PLEX_REPO_EOF
+                # GPG 키 가져오기
+                rpm --import https://downloads.plex.tv/plex-keys/PlexSign.key 2>&1 || true
+            fi
             ;;
     esac
 }
@@ -88,6 +109,9 @@ install_package() {
     local pkg="$1"
     local rpm_pkg=$(get_rpm_package "$pkg")
     local service=$(get_service_name "$pkg")
+    
+    # 패키지별 저장소 설정 (필요한 경우)
+    setup_repository "$pkg"
     
     # 패키지 설치
     if command -v dnf &> /dev/null; then
@@ -234,7 +258,7 @@ list_packages() {
     FIRST=true
     
     # 지원하는 패키지 목록
-    PACKAGES=("apache" "bind" "vsftpd" "nfs-utils" "docker" "git" "jellyfin" "plex" "home-assistant" "novnc")
+    PACKAGES=("apache" "bind" "vsftpd" "nfs-utils" "docker" "git" "plex" "home-assistant")
     
     for pkg in "${PACKAGES[@]}"; do
         local service=$(get_service_name "$pkg")
