@@ -7,13 +7,9 @@ const availablePackages = [
     { id: 'apache', name: 'Apache HTTP Server', description: '웹 서버 소프트웨어', category: '웹서버' },
     { id: 'bind', name: 'BIND DNS Server', description: 'DNS 서버 소프트웨어', category: 'DNS서버' },
     { id: 'vsftpd', name: 'vsftpd', description: 'FTP 서버', category: '파일서버' },
-    { id: 'nfs-utils', name: 'NFS Utils', description: 'NFS (Network File System) 유틸리티', category: '파일서버' },
     { id: 'docker', name: 'Docker', description: '컨테이너 플랫폼', category: '컨테이너' },
-    { id: 'git', name: 'Git', description: '버전 관리 시스템', category: '개발도구' },
-    { id: 'jellyfin', name: 'Jellyfin', description: '미디어 서버 소프트웨어', category: '미디어서버' },
     { id: 'plex', name: 'Plex', description: '미디어 스트리밍 서버', category: '미디어서버' },
     { id: 'home-assistant', name: 'Home Assistant', description: '홈 자동화 플랫폼', category: '홈자동화' },
-    { id: 'novnc', name: 'noVNC', description: '웹 기반 VNC 클라이언트', category: '원격접속' },
 ];
 
 // 패키지 ID로 카테고리 가져오기
@@ -22,51 +18,9 @@ const getPackageCategory = (packageId) => {
     return pkg ? pkg.category : '';
 };
 
-// 패키지 크기에 따른 설치 시간 계산 (밀리초)
-const getInstallTime = (packageId) => {
-    // 작은 패키지: 1-2초
-    const smallPackages = ['bind', 'git', 'novnc'];
-    // 중간 패키지: 2-3초
-    const mediumPackages = ['apache', 'vsftpd', 'nfs-utils'];
-    // 큰 패키지: 4-6초
-    const largePackages = ['docker', 'jellyfin', 'plex', 'home-assistant'];
-    
-    if (smallPackages.includes(packageId)) {
-        return 1000 + Math.random() * 1000; // 1-2초
-    } else if (mediumPackages.includes(packageId)) {
-        return 2000 + Math.random() * 1000; // 2-3초
-    } else if (largePackages.includes(packageId)) {
-        return 4000 + Math.random() * 2000; // 4-6초
-    }
-    // 기본값: 2-3초
-    return 2000 + Math.random() * 1000;
-};
-
-// localStorage에서 초기 패키지 목록 불러오기
-const getInitialPackages = () => {
-    try {
-        const savedPackages = localStorage.getItem('installedPackages');
-        if (savedPackages) {
-            const parsed = JSON.parse(savedPackages);
-            // installed를 boolean으로 처리 (백엔드에서 boolean으로 반환)
-            return parsed.map(pkg => ({
-                ...pkg,
-                installed: typeof pkg.installed === 'boolean' ? pkg.installed : pkg.installed === 'true' || pkg.installed === true
-            }));
-        }
-    } catch (e) {
-        console.error('패키지 목록 로드 실패:', e);
-    }
-    // 기본값: apache와 bind
-    return [
-        { id: 'apache', name: 'Apache HTTP Server', installed: true, serviceStatus: 'running', autoStart: true },
-        { id: 'bind', name: 'BIND DNS Server', installed: true, serviceStatus: 'stopped', autoStart: false }
-    ];
-};
-
 export default function PackageManagement() {
     const navigate = useNavigate();
-    const [packages, setPackages] = useState(getInitialPackages);
+    const [packages, setPackages] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [showSearchResults, setShowSearchResults] = useState(false);
@@ -79,30 +33,8 @@ export default function PackageManagement() {
     const searchContainerRef = useRef(null);
 
     useEffect(() => {
-        // 페이지 로드 시 localStorage에서 최신 상태 확인 (다른 탭에서 변경된 경우 대비)
-        const savedPackages = localStorage.getItem('installedPackages');
-        if (savedPackages) {
-            try {
-                const parsed = JSON.parse(savedPackages);
-                // installed를 boolean으로 처리
-                const normalized = parsed.map(pkg => ({
-                    ...pkg,
-                    installed: typeof pkg.installed === 'boolean' ? pkg.installed : pkg.installed === 'true' || pkg.installed === true
-                }));
-                setPackages(normalized);
-            } catch (e) {
-                console.error('패키지 목록 로드 실패:', e);
-            }
-        }
         loadPackages();
     }, []);
-
-    // packages 변경 시 localStorage에 저장하고 이벤트 발생
-    useEffect(() => {
-        localStorage.setItem('installedPackages', JSON.stringify(packages));
-        // 다른 컴포넌트에 변경 알림 (ENSMMockup 등)
-        window.dispatchEvent(new Event('packagesUpdated'));
-    }, [packages]);
 
     // 외부 클릭 감지로 검색 결과 닫기
     useEffect(() => {
@@ -123,20 +55,25 @@ export default function PackageManagement() {
     useEffect(() => {
         // 검색어가 변경될 때마다 검색 결과 업데이트
         if (searchQuery.trim() === "") {
-            // 검색어가 없으면 설치 가능한 모든 패키지 표시
-            const installable = availablePackages.filter(pkg => 
-                !packages.some(installed => installed.id === pkg.id)
-            );
+            // 검색어가 없으면 설치 가능한 모든 패키지 표시 (이미 설치된 것 제외)
+            const installedIds = packages
+                .filter(pkg => pkg.installed === true || pkg.installed === "true")
+                .map(pkg => pkg.id);
+            const installable = availablePackages.filter(pkg => !installedIds.includes(pkg.id));
             setSearchResults(installable);
         } else {
+            const query = searchQuery.toLowerCase();
+            const installedIds = packages
+                .filter(pkg => pkg.installed === true || pkg.installed === "true")
+                .map(pkg => pkg.id);
             const filtered = availablePackages.filter(pkg => {
-                const query = searchQuery.toLowerCase();
+                const isNotInstalled = !installedIds.includes(pkg.id);
                 return (
-                    pkg.name.toLowerCase().includes(query) ||
+                    (pkg.name.toLowerCase().includes(query) ||
                     pkg.id.toLowerCase().includes(query) ||
                     pkg.description.toLowerCase().includes(query) ||
-                    pkg.category.toLowerCase().includes(query)
-                ) && !packages.some(installed => installed.id === pkg.id);
+                    pkg.category.toLowerCase().includes(query))
+                ) && isNotInstalled;
             });
             setSearchResults(filtered);
         }
@@ -148,12 +85,11 @@ export default function PackageManagement() {
             const response = await apiFetch("/main/api/packages");
             if (response.ok) {
                 const data = await safeJsonParse(response, []);
-                // 설치된 패키지만 필터링 (installed === true인 것만)
-                const installedPackages = Array.isArray(data) 
-                    ? data.filter(pkg => pkg.installed === true || pkg.installed === "true")
-                    : [];
-                console.log("로드된 패키지 목록:", installedPackages);
-                setPackages(installedPackages);
+                // 백엔드에서 모든 패키지 목록 반환 (installed: true/false 포함)
+                // 모든 패키지를 저장 (UI에서 필터링하여 표시)
+                const allPackages = Array.isArray(data) ? data : [];
+                console.log("로드된 패키지 목록:", allPackages);
+                setPackages(allPackages);
             } else {
                 console.error("패키지 목록 API 응답 실패:", response.status, response.statusText);
                 setPackages([]);
@@ -169,16 +105,6 @@ export default function PackageManagement() {
     const handleInstall = async (packageId, packageName) => {
         setMessage("");
         
-        // 즉시 패키지 목록에 추가 (installing 상태로)
-        const newPackage = {
-            id: packageId,
-            name: packageName,
-            installed: 'installing', // 설치 중 상태 (문자열로 유지)
-            serviceStatus: 'stopped',
-            autoStart: false
-        };
-        
-        setPackages(prev => [...prev, newPackage]);
         setInstalling(prev => ({ ...prev, [packageId]: true }));
         setInstallProgress(prev => ({ ...prev, [packageId]: 0 }));
         
@@ -191,24 +117,17 @@ export default function PackageManagement() {
             const data = await safeJsonParse(response, {});
             
             if (response.ok) {
-                // 설치 완료: installed 상태를 true로 변경
-                setPackages(prev => prev.map(pkg => 
-                    pkg.id === packageId 
-                        ? { ...pkg, installed: true }
-                        : pkg
-                ));
+                // 설치 완료: 목록 새로고침 (백엔드에서 모든 패키지 목록 받아옴)
                 setMessage(`✅ ${packageName} 설치가 완료되었습니다.`);
                 setSearchQuery(""); // 검색창 초기화
                 setShowSearchResults(false);
-                loadPackages(); // 목록 새로고침
+                loadPackages(); // 목록 새로고침 (모든 패키지 다시 받아서 상태 업데이트)
             } else {
-                // 설치 실패: 패키지 제거
-                setPackages(prev => prev.filter(pkg => pkg.id !== packageId));
+                // 설치 실패
                 setMessage(data.error || `❌ ${packageName} 설치에 실패했습니다.`);
             }
         } catch (error) {
             console.error("패키지 설치 실패:", error);
-            setPackages(prev => prev.filter(pkg => pkg.id !== packageId));
             setMessage(`❌ ${packageName} 설치 중 오류가 발생했습니다.`);
         } finally {
             setInstalling(prev => ({ ...prev, [packageId]: false }));
@@ -233,9 +152,8 @@ export default function PackageManagement() {
             const data = await safeJsonParse(response, {});
             
             if (response.ok) {
-                setPackages(prev => prev.filter(pkg => pkg.id !== packageId));
                 setMessage("✅ 패키지가 제거되었습니다.");
-                loadPackages(); // 목록 새로고침
+                loadPackages(); // 목록 새로고침 (백엔드에서 업데이트된 상태 받아옴)
             } else {
                 setMessage(data.error || "❌ 패키지 제거에 실패했습니다.");
             }
@@ -261,25 +179,8 @@ export default function PackageManagement() {
             const data = await safeJsonParse(response, {});
             
             if (response.ok) {
-                // 서비스 상태 업데이트
-                setPackages(prev => prev.map(pkg => {
-                    if (pkg.id === packageId) {
-                        let newStatus = pkg.serviceStatus;
-                        
-                        if (action === 'start') {
-                            newStatus = 'running';
-                        } else if (action === 'stop') {
-                            newStatus = 'stopped';
-                        } else if (action === 'restart' || action === 'reload') {
-                            newStatus = 'running'; // 재시작/리로드 후 실행 중
-                        }
-                        
-                        return { ...pkg, serviceStatus: newStatus };
-                    }
-                    return pkg;
-                }));
                 setMessage(`✅ 서비스가 ${action === 'start' ? '시작' : action === 'stop' ? '중지' : action === 'restart' ? '재시작' : '리로드'}되었습니다.`);
-                loadPackages(); // 목록 새로고침
+                loadPackages(); // 목록 새로고침 (백엔드에서 업데이트된 상태 받아옴)
             } else {
                 setMessage(data.error || `❌ 서비스 ${action}에 실패했습니다.`);
             }
@@ -341,15 +242,8 @@ export default function PackageManagement() {
             const data = await safeJsonParse(response, {});
             
             if (response.ok) {
-                // 상태 업데이트
-                setPackages(prev => prev.map(pkg => {
-                    if (pkg.id === packageId) {
-                        return { ...pkg, autoStart: newAutoStart };
-                    }
-                    return pkg;
-                }));
                 setMessage(`✅ 자동 시작이 ${newAutoStart ? '활성화' : '비활성화'}되었습니다.`);
-                loadPackages(); // 목록 새로고침
+                loadPackages(); // 목록 새로고침 (백엔드에서 업데이트된 상태 받아옴)
             } else {
                 setMessage(data.error || `❌ 자동 시작 변경에 실패했습니다.`);
             }
@@ -381,13 +275,9 @@ export default function PackageManagement() {
             'apache': '/packages/apache',
             'bind': '/packages/bind',
             'vsftpd': '/packages/vsftpd',
-            'nfs-utils': '/packages/nfs',
             'docker': '/packages/docker',
-            'git': '/packages/git',
-            'jellyfin': '/packages/jellyfin',
             'plex': '/packages/plex',
-            'home-assistant': '/packages/home-assistant',
-            'novnc': '/packages/novnc'
+            'home-assistant': '/packages/home-assistant'
         };
         return configPaths[packageId] || null;
     };
@@ -458,9 +348,10 @@ export default function PackageManagement() {
                         setShowSearchResults(true);
                         // 포커스 시 검색 결과 업데이트
                         if (searchQuery.trim() === "") {
-                            const installable = availablePackages.filter(pkg => 
-                                !packages.some(installed => installed.id === pkg.id)
-                            );
+                            const installedIds = packages
+                                .filter(pkg => pkg.installed === true || pkg.installed === "true")
+                                .map(pkg => pkg.id);
+                            const installable = availablePackages.filter(pkg => !installedIds.includes(pkg.id));
                             setSearchResults(installable);
                         }
                     }}
@@ -605,89 +496,46 @@ export default function PackageManagement() {
                                             padding: "0.25rem 0.75rem",
                                             borderRadius: "4px",
                                             fontSize: "0.85rem",
-                                            backgroundColor: pkg.installed === true ? "#1a3a1a" : pkg.installed === "installing" ? "#3a3a1a" : "#3a1a1a",
-                                            color: pkg.installed === true ? "#66ff66" : pkg.installed === "installing" ? "#ffaa00" : "#ff6666"
+                                            backgroundColor: "#1a3a1a",
+                                            color: "#66ff66"
                                         }}
                                     >
-                                        {pkg.installed === true ? "✓ 설치됨" : pkg.installed === "installing" ? "⏳ 설치 중..." : "✗ 미설치"}
+                                        ✓ 설치됨
                                     </span>
-                                    {pkg.installed === true && (
-                                        <span
-                                            style={{
-                                                padding: "0.25rem 0.75rem",
-                                                borderRadius: "4px",
-                                                fontSize: "0.85rem",
-                                                backgroundColor: getStatusColor(pkg.serviceStatus) + "33",
-                                                color: getStatusColor(pkg.serviceStatus)
-                                            }}
-                                        >
-                                            {getStatusText(pkg.serviceStatus)}
-                                        </span>
-                                    )}
+                                    <span
+                                        style={{
+                                            padding: "0.25rem 0.75rem",
+                                            borderRadius: "4px",
+                                            fontSize: "0.85rem",
+                                            backgroundColor: getStatusColor(pkg.serviceStatus) + "33",
+                                            color: getStatusColor(pkg.serviceStatus)
+                                        }}
+                                    >
+                                        {getStatusText(pkg.serviceStatus)}
+                                    </span>
                                 </div>
                             </div>
                             <div style={{ display: "flex", gap: "0.5rem" }}>
-                                {pkg.installed === true && (
-                                    <button
-                                        onClick={() => handleRemove(pkg.id)}
-                                        disabled={loading[pkg.id]}
-                                        style={{
-                                            padding: "0.5rem 1rem",
-                                            backgroundColor: loading[pkg.id] ? "#555" : "#ef4444",
-                                            color: "white",
-                                            border: "none",
-                                            borderRadius: "4px",
-                                            cursor: loading[pkg.id] ? "not-allowed" : "pointer",
-                                            fontSize: "0.9rem"
-                                        }}
-                                    >
-                                        제거
-                                    </button>
-                                )}
+                                <button
+                                    onClick={() => handleRemove(pkg.id)}
+                                    disabled={loading[pkg.id]}
+                                    style={{
+                                        padding: "0.5rem 1rem",
+                                        backgroundColor: loading[pkg.id] ? "#555" : "#ef4444",
+                                        color: "white",
+                                        border: "none",
+                                        borderRadius: "4px",
+                                        cursor: loading[pkg.id] ? "not-allowed" : "pointer",
+                                        fontSize: "0.9rem"
+                                    }}
+                                >
+                                    제거
+                                </button>
                             </div>
                         </div>
 
-                        {(pkg.installed === true || pkg.installed === "installing") && (
-                            <div style={{ borderTop: "1px solid #444", paddingTop: "1rem", marginTop: "1rem" }}>
-                                {pkg.installed === "installing" ? (
-                                    // 설치 중일 때 로딩바 표시
-                                    <div>
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                                            <h4 style={{ fontSize: "1rem", fontWeight: "bold" }}>
-                                                설치 중...
-                                            </h4>
-                                            <span style={{ fontSize: "0.9rem", color: "#aaa" }}>
-                                                {Math.round(installProgress[pkg.id] || 0)}%
-                                            </span>
-                                        </div>
-                                        <div style={{
-                                            width: "100%",
-                                            height: "24px",
-                                            backgroundColor: "#2a2a2a",
-                                            borderRadius: "4px",
-                                            overflow: "hidden",
-                                            position: "relative"
-                                        }}>
-                                            <div style={{
-                                                width: `${installProgress[pkg.id] || 0}%`,
-                                                height: "100%",
-                                                backgroundColor: "#4ade80",
-                                                transition: "width 0.1s ease-out",
-                                                borderRadius: "4px",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                color: "#fff",
-                                                fontSize: "0.75rem",
-                                                fontWeight: "bold"
-                                            }}>
-                                                {installProgress[pkg.id] >= 10 && `${Math.round(installProgress[pkg.id] || 0)}%`}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    // 설치 완료 후 서비스 제어 버튼 표시
-                                    <>
+                        <div style={{ borderTop: "1px solid #444", paddingTop: "1rem", marginTop: "1rem" }}>
+                            <>
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
                                             <h4 style={{ fontSize: "1rem", fontWeight: "bold" }}>
                                                 서비스 제어
@@ -798,14 +646,12 @@ export default function PackageManagement() {
                                     )}
                                         </div>
                                     </>
-                                )}
-                            </div>
-                        )}
+                        </div>
                     </div>
                 ))}
             </div>
 
-            {packages.length === 0 && !refreshing && (
+            {packages.filter(pkg => pkg.installed === true || pkg.installed === "true").length === 0 && !refreshing && (
                 <div style={{
                     padding: "2rem",
                     textAlign: "center",

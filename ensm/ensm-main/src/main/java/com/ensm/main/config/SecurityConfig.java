@@ -17,6 +17,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/main/static/**", "/main/favicon.ico", "/main/manifest.json", "/main/descriptions/**", "/main/index.html", "/main", "/main/", "/main/dashboard", "/main/ensm/**", "/main/system/**", "/main/packages/**", "/main/network/**", "/main/tools/**").permitAll()
                         .requestMatchers("/main/api/system-config/**").authenticated()
+                        .requestMatchers("/main/api/packages/**").permitAll()
                         .requestMatchers("/main/api/**").authenticated()
                         .anyRequest().permitAll()
                 )

@@ -21,13 +21,9 @@ import LvmManagement from "./pages/system/LvmManagement";
 import ApacheConfig from "./pages/packages/ApacheConfig";
 import BindConfig from "./pages/packages/BindConfig";
 import VsftpdConfig from "./pages/packages/VsftpdConfig";
-import NfsConfig from "./pages/packages/NfsConfig";
 import DockerConfig from "./pages/packages/DockerConfig";
-import GitConfig from "./pages/packages/GitConfig";
-import JellyfinConfig from "./pages/packages/JellyfinConfig";
 import PlexConfig from "./pages/packages/PlexConfig";
 import HomeAssistantConfig from "./pages/packages/HomeAssistantConfig";
-import NovncConfig from "./pages/packages/NovncConfig";
 import PackageManagement from "./pages/packages/PackageManagement";
 import NetworkLog from "./pages/network/NetworkLog";
 import PortDaemonStatus from "./pages/network/PortDaemonStatus";
@@ -211,13 +207,9 @@ function App() {
                         <Route path="/packages/apache" element={<ApacheConfig />} />
                         <Route path="/packages/bind" element={<BindConfig />} />
                         <Route path="/packages/vsftpd" element={<VsftpdConfig />} />
-                        <Route path="/packages/nfs" element={<NfsConfig />} />
                         <Route path="/packages/docker" element={<DockerConfig />} />
-                        <Route path="/packages/git" element={<GitConfig />} />
-                        <Route path="/packages/jellyfin" element={<JellyfinConfig />} />
                         <Route path="/packages/plex" element={<PlexConfig />} />
                         <Route path="/packages/home-assistant" element={<HomeAssistantConfig />} />
-                        <Route path="/packages/novnc" element={<NovncConfig />} />
                         <Route path="/packages/management" element={<PackageManagement />} />
                         <Route path="/network/log" element={<NetworkLog />} />
                         <Route path="/network/port" element={<PortDaemonStatus />} />

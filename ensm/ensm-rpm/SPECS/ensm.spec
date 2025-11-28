@@ -386,36 +386,6 @@ mkdir -p /var/log/ensm/main /var/log/ensm/auth
 chown -R ensm:ensm /var/log/ensm
 chmod -R 755 /var/log/ensm
 
-# ENSM 설정 파일 생성 (로그 수준 설정 적용)
-mkdir -p /etc/ensm
-cat > /etc/ensm/application.properties <<'ENSM_CONFIG_EOF'
-# ENSM Main Application Configuration
-# 로그 파일 경로
-logging.file.name=/var/log/ensm/main/main-app.log
-# 로그 수준 설정
-logging.level.org.springframework.web=INFO
-logging.level.com.ensm=INFO
-# 로그 파일 롤링 설정
-logging.file.max-size=10MB
-logging.file.max-history=30
-ENSM_CONFIG_EOF
-
-cat > /etc/ensm/application-auth.properties <<'ENSM_AUTH_CONFIG_EOF'
-# ENSM Auth Application Configuration
-# 로그 파일 경로
-logging.file.name=/var/log/ensm/auth/auth-app.log
-# 로그 수준 설정
-logging.level.org.springframework.web=INFO
-logging.level.com.ensm=INFO
-# 로그 파일 롤링 설정
-logging.file.max-size=10MB
-logging.file.max-history=30
-ENSM_AUTH_CONFIG_EOF
-
-chown ensm:ensm /etc/ensm/application.properties /etc/ensm/application-auth.properties
-chmod 644 /etc/ensm/application.properties /etc/ensm/application-auth.properties
-echo "✅ ENSM 설정 파일 생성 완료: /etc/ensm/application.properties"
-
 # 범용 스크립트 실행 wrapper 컴파일 및 setuid 설정
 if [ -f /usr/local/bin/ensm-scripts/system/run_script.c ]; then
     if command -v gcc &> /dev/null; then
@@ -975,20 +945,6 @@ mkdir -p /etc/grafana/provisioning/datasources
 mkdir -p /etc/grafana/provisioning/dashboards
 mkdir -p /var/lib/grafana/dashboards
 
-# ENSM 설정 파일 생성
-if [ ! -f /etc/ensm/application.properties ]; then
-    cat > /etc/ensm/application.properties <<'ENSM_CONFIG_EOF'
-# ENSM 공통 설정
-# 로그 파일 경로는 환경 변수로 오버라이드 가능
-logging.file.name=${LOG_PATH_MAIN:/var/log/ensm/main/main-app.log}
-logging.level.org.springframework.web=INFO
-logging.level.com.ensm=INFO
-ENSM_CONFIG_EOF
-    chown ensm:ensm /etc/ensm/application.properties
-    chmod 644 /etc/ensm/application.properties
-    echo "✅ ENSM 설정 파일 생성: /etc/ensm/application.properties"
-fi
-
 # 데이터소스 자동 구성 (Prometheus, Loki)
 cat > /etc/grafana/provisioning/datasources/datasources.yaml <<'EOF'
 apiVersion: 1
@@ -1158,18 +1114,41 @@ cat > /var/lib/grafana/dashboards/system-monitor-gauge-logs.json <<'EOF'
       "targets": [
         {
           "datasource": { "type": "loki", "uid": null },
-          "expr": "{job=~\"varlogs|ensm|journald\"}",
+          "expr": "{job=\"ensm\"}",
           "refId": "A"
+        },
+        {
+          "datasource": { "type": "loki", "uid": null },
+          "expr": "{job=\"varlogs\"}",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "loki", "uid": null },
+          "expr": "{job=\"journald\"}",
+          "refId": "C"
         }
       ],
       "options": {
         "showTime": true,
-        "wrapLogMessage": true
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "dedupStrategy": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "frameIndex": 0
+          }
+        }
       }
     }
   ],
   "templating": { "list": [] },
-  "time": { "from": "now-6h", "to": "now" }
+  "time": { "from": "now-24h", "to": "now" },
+  "refresh": "10s",
+  "timepicker": {
+    "refresh_intervals": ["10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+  }
 }
 EOF
 

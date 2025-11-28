@@ -55,40 +55,31 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // execv를 사용하여 스크립트 실행
-    // argv[1]부터가 스크립트 인자이므로, argv[1]을 full_path로 교체
-    char **new_argv = (char **)malloc((argc + 1) * sizeof(char *));
-    if (new_argv == NULL) {
-        fprintf(stderr, "오류: 메모리 할당 실패\n");
-        return 1;
-    }
-
-    // setuid가 작동하는지 확인: 실제 UID와 유효 UID를 root로 설정
+    // root 권한으로 전환 (setuid 비트가 설정되어 있어야 함)
     uid_t real_uid = getuid();
     uid_t eff_uid = geteuid();
     
-    // 유효 UID가 root가 아니면 root로 설정 시도
-    // setreuid를 사용하여 실제 UID와 유효 UID를 모두 root로 설정
     if (eff_uid != 0) {
-        // setreuid(0, 0)을 사용하여 실제 UID와 유효 UID를 모두 root로 설정
+        // setreuid를 사용하여 실제 UID와 유효 UID를 모두 root로 설정
         if (setreuid(0, 0) != 0) {
             fprintf(stderr, "오류: root 권한으로 전환할 수 없습니다.\n");
             fprintf(stderr, "  실제 UID: %d, 유효 UID: %d\n", real_uid, eff_uid);
             fprintf(stderr, "  가능한 원인:\n");
             fprintf(stderr, "    1. setuid 비트가 설정되지 않았거나 작동하지 않음\n");
             fprintf(stderr, "    2. SELinux가 setuid 실행을 차단함\n");
-            fprintf(stderr, "    3. 파일 시스템이 nosuid 옵션으로 마운트됨\n");
-            fprintf(stderr, "  해결 방법:\n");
-            fprintf(stderr, "    - chmod 4755 /usr/local/bin/ensm-scripts/system/run_script\n");
-            fprintf(stderr, "    - chcon -t unconfined_exec_t /usr/local/bin/ensm-scripts/system/run_script (SELinux)\n");
-            free(new_argv);
             return 1;
         }
     } else {
-        // 유효 UID가 이미 root인 경우, 실제 UID도 root로 설정
-        if (real_uid != 0) {
-            setreuid(0, 0);
-        }
+        // 이미 root인 경우에도 실제 UID를 root로 설정
+        setreuid(0, 0);
+    }
+
+    // execv를 사용하여 스크립트 실행
+    // argv[1]부터가 스크립트 인자이므로, argv[1]을 full_path로 교체
+    char **new_argv = (char **)malloc((argc + 1) * sizeof(char *));
+    if (new_argv == NULL) {
+        fprintf(stderr, "오류: 메모리 할당 실패\n");
+        return 1;
     }
 
     // 스크립트 경로를 full_path로 설정

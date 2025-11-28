@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { apiFetch, safeJsonParse } from "./utils/api";
 import {
   Search,
   Settings,
@@ -138,13 +139,9 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
       'apache': '/packages/apache',
       'bind': '/packages/bind',
       'vsftpd': '/packages/vsftpd',
-      'nfs-utils': '/packages/nfs',
       'docker': '/packages/docker',
-      'git': '/packages/git',
-      'jellyfin': '/packages/jellyfin',
       'plex': '/packages/plex',
-      'home-assistant': '/packages/home-assistant',
-      'novnc': '/packages/novnc'
+      'home-assistant': '/packages/home-assistant'
     };
     return pathMap[packageId] || null;
   }, []);
@@ -154,48 +151,38 @@ export default function ENSMMockup({ children, selectedDocKey, setSelectedDocKey
       'apache': 'Apache HTTP Server',
       'bind': 'BIND DNS Server',
       'vsftpd': 'vsftpd FTP Server',
-      'nfs-utils': 'NFS Storage',
       'docker': 'Docker Engine',
-      'git': 'Git Version Control',
-      'jellyfin': 'Jellyfin Media',
       'plex': 'Plex Media',
-      'home-assistant': 'Home Assistant',
-      'novnc': 'noVNC Client'
+      'home-assistant': 'Home Assistant'
     };
     return nameMap[packageId] || packageId;
   }, []);
 
   useEffect(() => {
-    const loadInstalledPackages = () => {
-      const savedPackages = localStorage.getItem('installedPackages');
-      if (savedPackages) {
-        try {
-          const parsed = JSON.parse(savedPackages);
-          const installed = parsed.filter(pkg => pkg.installed === 'true');
+    const loadInstalledPackages = async () => {
+      try {
+        const response = await apiFetch("/main/api/packages");
+        if (response.ok) {
+          const data = await safeJsonParse(response, []);
+          // 설치된 패키지만 필터링 (installed === true인 것만)
+          const installed = Array.isArray(data) 
+            ? data.filter(pkg => pkg.installed === true || pkg.installed === "true")
+            : [];
           setInstalledPackages(installed);
-        } catch (e) {
-          console.error('설치된 패키지 목록 로드 실패:', e);
+        } else {
+          console.error('패키지 목록 API 응답 실패:', response.status);
+          setInstalledPackages([]);
         }
-      } else {
-        setInstalledPackages([
-          { id: 'apache', installed: 'true' },
-          { id: 'bind', installed: 'true' }
-        ]);
+      } catch (error) {
+        console.error('설치된 패키지 목록 로드 실패:', error);
+        setInstalledPackages([]);
       }
     };
+    
     loadInstalledPackages();
-    const handleStorageChange = (e) => {
-      if (e.key === 'installedPackages') loadInstalledPackages();
-    };
-    window.addEventListener('storage', handleStorageChange);
-    const handlePackageChange = () => {
-      loadInstalledPackages();
-    };
-    window.addEventListener('packagesUpdated', handlePackageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('packagesUpdated', handlePackageChange);
-    };
+    // 주기적으로 패키지 목록 갱신 (30초마다)
+    const interval = setInterval(loadInstalledPackages, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const commandMap = {

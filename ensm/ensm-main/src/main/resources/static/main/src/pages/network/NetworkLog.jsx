@@ -1,7 +1,176 @@
 import React, { useState, useEffect } from "react";
 import { apiFetch, safeJsonParse } from '../../utils/api';
-// commonStyles가 있다면 import 하셔도 좋지만, 
-// 이 컴포넌트 내에서 완결되도록 스타일을 모두 포함시켰습니다.
+
+// 네트워크 인터페이스 통계 컴포넌트
+function NetworkInterfacesStats({ data }) {
+  if (!data) return <div style={styles.emptyData}>데이터 없음</div>;
+  
+  const lines = data.split('\n').filter(line => line.trim());
+  const interfaces = [];
+  
+  lines.forEach(line => {
+    const match = line.match(/^\s*(\S+):\s*(.+)$/);
+    if (match) {
+      const iface = match[1].replace(':', '');
+      const stats = match[2].trim().split(/\s+/);
+      if (stats.length >= 16) {
+        interfaces.push({
+          name: iface,
+          rxBytes: stats[0],
+          rxPackets: stats[1],
+          txBytes: stats[8],
+          txPackets: stats[9]
+        });
+      }
+    }
+  });
+  
+  const formatBytes = (bytes) => {
+    const num = parseInt(bytes);
+    if (isNaN(num)) return bytes;
+    if (num < 1024) return num + ' B';
+    if (num < 1024 * 1024) return (num / 1024).toFixed(2) + ' KB';
+    if (num < 1024 * 1024 * 1024) return (num / (1024 * 1024)).toFixed(2) + ' MB';
+    return (num / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+  };
+  
+  return (
+    <div style={styles.statsTableContainer}>
+      <table style={styles.statsTable}>
+        <thead>
+          <tr>
+            <th style={styles.statsTh}>인터페이스</th>
+            <th style={styles.statsTh}>수신</th>
+            <th style={styles.statsTh}>송신</th>
+          </tr>
+        </thead>
+        <tbody>
+          {interfaces.map((iface, idx) => (
+            <tr key={idx} style={styles.statsTr}>
+              <td style={styles.statsTd}>
+                <span style={styles.interfaceBadge}>{iface.name}</span>
+              </td>
+              <td style={styles.statsTd}>
+                <div style={styles.statValue}>{formatBytes(iface.rxBytes)}</div>
+                <div style={styles.statLabel}>{iface.rxPackets} packets</div>
+              </td>
+              <td style={styles.statsTd}>
+                <div style={styles.statValue}>{formatBytes(iface.txBytes)}</div>
+                <div style={styles.statLabel}>{iface.txPackets} packets</div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// 네트워크 연결 통계 컴포넌트
+function NetworkConnectionsStats({ data }) {
+  if (!data) return <div style={styles.emptyData}>데이터 없음</div>;
+  
+  const lines = data.split('\n').filter(line => line.trim());
+  const summary = {};
+  const transportLines = [];
+  let inSummary = false;
+  
+  lines.forEach((line, idx) => {
+    if (line.includes('Total:')) {
+      summary.total = line.match(/Total:\s*(\d+)/)?.[1] || '';
+    }
+    if (line.includes('TCP:')) {
+      const tcpMatch = line.match(/TCP:\s*(\d+)\s*\(estab\s*(\d+)/);
+      if (tcpMatch) {
+        summary.tcp = { total: tcpMatch[1], estab: tcpMatch[2] };
+      }
+    }
+    if (line.includes('Transport')) {
+      inSummary = true;
+    }
+    if (inSummary && line.match(/^\s*(RAW|UDP|TCP|INET|FRAG)\s+/)) {
+      const parts = line.trim().split(/\s+/);
+      if (parts.length >= 4) {
+        transportLines.push({
+          transport: parts[0],
+          total: parts[1],
+          ip: parts[2],
+          ipv6: parts[3]
+        });
+      }
+    }
+  });
+  
+  return (
+    <div>
+      {summary.total && (
+        <div style={styles.summarySection}>
+          <div style={styles.summaryItem}>
+            <span style={styles.summaryLabel}>Total:</span>
+            <span style={styles.summaryValue}>{summary.total}</span>
+          </div>
+          {summary.tcp && (
+            <div style={styles.summaryItem}>
+              <span style={styles.summaryLabel}>TCP:</span>
+              <span style={styles.summaryValue}>{summary.tcp.total} (estab {summary.tcp.estab})</span>
+            </div>
+          )}
+        </div>
+      )}
+      {transportLines.length > 0 && (
+        <div style={styles.statsTableContainer}>
+          <table style={styles.statsTable}>
+            <thead>
+              <tr>
+                <th style={styles.statsTh}>Transport</th>
+                <th style={styles.statsTh}>Total</th>
+                <th style={styles.statsTh}>IP</th>
+                <th style={styles.statsTh}>IPv6</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transportLines.map((item, idx) => (
+                <tr key={idx} style={styles.statsTr}>
+                  <td style={styles.statsTd}>{item.transport}</td>
+                  <td style={styles.statsTd}>{item.total}</td>
+                  <td style={styles.statsTd}>{item.ip}</td>
+                  <td style={styles.statsTd}>{item.ipv6}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// 라우팅 테이블 컴포넌트
+function NetworkRoutesStats({ data }) {
+  if (!data) return <div style={styles.emptyData}>데이터 없음</div>;
+  
+  const lines = data.split('\n').filter(line => line.trim());
+  
+  return (
+    <div style={styles.routesContainer}>
+      {lines.map((route, idx) => {
+        // default route 강조
+        const isDefault = route.includes('default via');
+        return (
+          <div 
+            key={idx} 
+            style={{
+              ...styles.routeItem,
+              backgroundColor: isDefault ? 'rgba(88, 101, 242, 0.1)' : 'transparent'
+            }}
+          >
+            <code style={styles.routeText}>{route}</code>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function NetworkLog() {
   // ==========================================
@@ -41,6 +210,16 @@ export default function NetworkLog() {
 
       if (statsRes.ok) {
         const stats = await safeJsonParse(statsRes, null);
+        // 문자열로 이스케이프된 경우 처리
+        if (stats && typeof stats.interfaces === 'string') {
+          stats.interfaces = stats.interfaces.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+        }
+        if (stats && typeof stats.connections === 'string') {
+          stats.connections = stats.connections.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+        }
+        if (stats && typeof stats.routes === 'string') {
+          stats.routes = stats.routes.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+        }
         setNetworkStats(stats);
       } else {
         console.error("네트워크 통계 API 응답 실패");
@@ -181,17 +360,29 @@ export default function NetworkLog() {
             <div style={styles.statsGrid}>
               <div style={styles.statBox}>
                 <h4 style={styles.statTitle}>인터페이스 통계</h4>
-                <pre style={styles.statContent}>{networkStats.interfaces || "데이터 없음"}</pre>
+                {networkStats.interfaces ? (
+                  <NetworkInterfacesStats data={networkStats.interfaces} />
+                ) : (
+                  <div style={styles.emptyData}>데이터 없음</div>
+                )}
               </div>
               
               <div style={styles.statBox}>
                 <h4 style={styles.statTitle}>연결(Connections) 통계</h4>
-                <pre style={styles.statContent}>{networkStats.connections || "데이터 없음"}</pre>
+                {networkStats.connections ? (
+                  <NetworkConnectionsStats data={networkStats.connections} />
+                ) : (
+                  <div style={styles.emptyData}>데이터 없음</div>
+                )}
               </div>
               
               <div style={styles.statBox}>
                 <h4 style={styles.statTitle}>라우팅 테이블</h4>
-                <pre style={styles.statContent}>{networkStats.routes || "데이터 없음"}</pre>
+                {networkStats.routes ? (
+                  <NetworkRoutesStats data={networkStats.routes} />
+                ) : (
+                  <div style={styles.emptyData}>데이터 없음</div>
+                )}
               </div>
             </div>
           </section>
@@ -412,5 +603,99 @@ const styles = {
     whiteSpace: "pre-wrap",
     overflowX: "auto",
     maxHeight: "250px"
+  },
+  emptyData: {
+    color: "#666",
+    textAlign: "center",
+    padding: "1rem",
+    fontStyle: "italic"
+  },
+  // Stats Table Styles
+  statsTableContainer: {
+    overflowX: "auto",
+    marginTop: "0.5rem"
+  },
+  statsTable: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: "0.85rem"
+  },
+  statsTh: {
+    textAlign: "left",
+    padding: "0.5rem",
+    color: "#888",
+    borderBottom: "1px solid #444",
+    fontWeight: "600",
+    fontSize: "0.75rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px"
+  },
+  statsTr: {
+    borderBottom: "1px solid #3a3a3a"
+  },
+  statsTd: {
+    padding: "0.75rem 0.5rem",
+    color: "#ddd"
+  },
+  interfaceBadge: {
+    backgroundColor: "rgba(88, 101, 242, 0.2)",
+    color: "#8ea1e1",
+    padding: "0.25rem 0.5rem",
+    borderRadius: "4px",
+    fontSize: "0.85rem",
+    fontWeight: "600",
+    fontFamily: "monospace"
+  },
+  statValue: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: "0.9rem"
+  },
+  statLabel: {
+    color: "#888",
+    fontSize: "0.75rem",
+    marginTop: "0.25rem"
+  },
+  summarySection: {
+    marginBottom: "1rem",
+    padding: "0.75rem",
+    backgroundColor: "rgba(88, 101, 242, 0.1)",
+    borderRadius: "6px"
+  },
+  summaryItem: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: "0.5rem"
+  },
+  summaryLabel: {
+    color: "#aaa",
+    fontWeight: "600",
+    fontSize: "0.85rem"
+  },
+  summaryValue: {
+    color: "#fff",
+    fontWeight: "600",
+    fontFamily: "monospace"
+  },
+  routesContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+    maxHeight: "250px",
+    overflowY: "auto"
+  },
+  routeItem: {
+    padding: "0.75rem",
+    borderRadius: "6px",
+    border: "1px solid #444",
+    transition: "background-color 0.2s"
+  },
+  routeText: {
+    fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+    fontSize: "0.85rem",
+    color: "#ccc",
+    display: "block",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-all"
   }
 };

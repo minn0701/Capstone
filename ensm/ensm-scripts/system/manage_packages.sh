@@ -18,26 +18,14 @@ get_service_name() {
         "vsftpd")
             echo "vsftpd"
             ;;
-        "nfs-utils")
-            echo "nfs-server"
-            ;;
         "docker")
             echo "docker"
-            ;;
-        "git")
-            echo ""  # Git은 서비스가 없음
-            ;;
-        "jellyfin")
-            echo "jellyfin"
             ;;
         "plex")
             echo "plexmediaserver"
             ;;
         "home-assistant")
             echo "home-assistant"
-            ;;
-        "novnc")
-            echo ""  # noVNC는 서비스가 없을 수 있음
             ;;
         *)
             echo "$1"
@@ -56,26 +44,14 @@ get_rpm_package() {
         "vsftpd")
             echo "vsftpd"
             ;;
-        "nfs-utils")
-            echo "nfs-utils"
-            ;;
         "docker")
             echo "docker docker-ce"
-            ;;
-        "git")
-            echo "git"
-            ;;
-        "jellyfin")
-            echo "jellyfin"
             ;;
         "plex")
             echo "plexmediaserver"
             ;;
         "home-assistant")
             echo "home-assistant"
-            ;;
-        "novnc")
-            echo "novnc"
             ;;
         *)
             echo "$1"
@@ -234,7 +210,7 @@ list_packages() {
     FIRST=true
     
     # 지원하는 패키지 목록
-    PACKAGES=("apache" "bind" "vsftpd" "nfs-utils" "docker" "git" "jellyfin" "plex" "home-assistant" "novnc")
+    PACKAGES=("apache" "bind" "vsftpd" "docker" "plex" "home-assistant")
     
     for pkg in "${PACKAGES[@]}"; do
         local service=$(get_service_name "$pkg")
@@ -301,7 +277,7 @@ case "$ACTION" in
             echo "❌ 패키지 이름과 서비스 액션이 필요합니다."
             exit 1
         fi
-        local service=$(get_service_name "$PACKAGE")
+        service=$(get_service_name "$PACKAGE")
         control_service "$service" "$SERVICE_ACTION"
         ;;
     "autostart")
@@ -309,7 +285,7 @@ case "$ACTION" in
             echo "❌ 패키지 이름과 enable 값이 필요합니다."
             exit 1
         fi
-        local service=$(get_service_name "$PACKAGE")
+        service=$(get_service_name "$PACKAGE")
         toggle_autostart "$service" "$SERVICE_ACTION"
         ;;
     *)

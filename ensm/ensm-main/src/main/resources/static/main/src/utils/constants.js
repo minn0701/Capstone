@@ -6,13 +6,9 @@ export const STORAGE_KEYS = {
   APACHE_CONFIG: 'config_apache',
   BIND_CONFIG: 'config_bind',
   VSFTPD_CONFIG: 'config_vsftpd',
-  NFS_CONFIG: 'config_nfs',
   DOCKER_CONFIG: 'config_docker',
-  GIT_CONFIG: 'config_git',
-  JELLYFIN_CONFIG: 'config_jellyfin',
   PLEX_CONFIG: 'config_plex',
   HOME_ASSISTANT_CONFIG: 'config_home-assistant',
-  NOVNC_CONFIG: 'config_novnc',
   DDNS_CONFIG: 'config_ddns',
 };
 
@@ -21,13 +17,9 @@ export const PACKAGE_INFO = {
   'apache': { name: 'Apache HTTP Server', category: '웹서버' },
   'bind': { name: 'BIND DNS Server', category: 'DNS서버' },
   'vsftpd': { name: 'vsftpd', category: '파일서버' },
-  'nfs-utils': { name: 'NFS Utils', category: '파일서버' },
   'docker': { name: 'Docker', category: '컨테이너' },
-  'git': { name: 'Git', category: '개발도구' },
-  'jellyfin': { name: 'Jellyfin', category: '미디어서버' },
   'plex': { name: 'Plex', category: '미디어서버' },
   'home-assistant': { name: 'Home Assistant', category: '홈자동화' },
-  'novnc': { name: 'noVNC', category: '원격접속' },
 };
 
 // 패키지 설정 페이지 경로
@@ -35,13 +27,9 @@ export const PACKAGE_ROUTES = {
   'apache': '/packages/apache',
   'bind': '/packages/bind',
   'vsftpd': '/packages/vsftpd',
-  'nfs-utils': '/packages/nfs',
   'docker': '/packages/docker',
-  'git': '/packages/git',
-  'jellyfin': '/packages/jellyfin',
   'plex': '/packages/plex',
   'home-assistant': '/packages/home-assistant',
-  'novnc': '/packages/novnc',
 };
 
 // 패키지 표시 이름
@@ -49,21 +37,11 @@ export const PACKAGE_DISPLAY_NAMES = {
   'apache': 'Apache HTTP Server 설정',
   'bind': 'BIND DNS 서버 설정',
   'vsftpd': 'vsftpd FTP 서버 설정',
-  'nfs-utils': 'NFS (Network File System) 설정',
   'docker': 'Docker 설정',
-  'git': 'Git 설정',
-  'jellyfin': 'Jellyfin 미디어 서버 설정',
   'plex': 'Plex 미디어 서버 설정',
   'home-assistant': 'Home Assistant 설정',
-  'novnc': 'noVNC 웹 VNC 클라이언트 설정',
 };
 
-// 설치 시간 (밀리초)
-export const INSTALL_TIMES = {
-  SMALL: { min: 1000, max: 2000 }, // bind, git, novnc
-  MEDIUM: { min: 2000, max: 3000 }, // apache, vsftpd, nfs-utils
-  LARGE: { min: 4000, max: 6000 }, // docker, jellyfin, plex, home-assistant
-};
 
 // 서비스 상태
 export const SERVICE_STATUS = {

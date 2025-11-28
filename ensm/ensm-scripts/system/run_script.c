@@ -55,6 +55,25 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // root 권한으로 전환 (setuid 비트가 설정되어 있어야 함)
+    uid_t real_uid = getuid();
+    uid_t eff_uid = geteuid();
+    
+    if (eff_uid != 0) {
+        // setreuid를 사용하여 실제 UID와 유효 UID를 모두 root로 설정
+        if (setreuid(0, 0) != 0) {
+            fprintf(stderr, "오류: root 권한으로 전환할 수 없습니다.\n");
+            fprintf(stderr, "  실제 UID: %d, 유효 UID: %d\n", real_uid, eff_uid);
+            fprintf(stderr, "  가능한 원인:\n");
+            fprintf(stderr, "    1. setuid 비트가 설정되지 않았거나 작동하지 않음\n");
+            fprintf(stderr, "    2. SELinux가 setuid 실행을 차단함\n");
+            return 1;
+        }
+    } else {
+        // 이미 root인 경우에도 실제 UID를 root로 설정
+        setreuid(0, 0);
+    }
+
     // execv를 사용하여 스크립트 실행
     // argv[1]부터가 스크립트 인자이므로, argv[1]을 full_path로 교체
     char **new_argv = (char **)malloc((argc + 1) * sizeof(char *));

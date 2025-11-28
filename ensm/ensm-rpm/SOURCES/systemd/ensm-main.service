@@ -8,7 +8,7 @@ Type=simple
 User=ensm
 Group=ensm
 WorkingDirectory=/opt/ensm
-ExecStart=/opt/ensm/java/jdk/bin/java $JAVA_OPTS --spring.config.location=file:/etc/ensm/application.properties -jar /opt/ensm/ensm-main.jar
+ExecStart=/opt/ensm/java/jdk/bin/java $JAVA_OPTS -jar /opt/ensm/ensm-main.jar
 Restart=always
 RestartSec=10
 StandardOutput=journal

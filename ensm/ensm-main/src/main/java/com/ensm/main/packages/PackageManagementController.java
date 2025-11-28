@@ -57,6 +57,10 @@ public class PackageManagementController {
             return ResponseEntity.badRequest().body(Map.of("error", "패키지 ID가 필요합니다."));
         }
         String result = packageManagementService.installPackage(pkgId);
+        // 스크립트 실행 결과가 오류인지 확인
+        if (result != null && (result.startsWith("오류:") || result.startsWith("❌"))) {
+            return ResponseEntity.status(500).body(Map.of("error", result));
+        }
         return ResponseEntity.ok(Map.of("message", result));
     }
     
@@ -66,6 +70,10 @@ public class PackageManagementController {
     @DeleteMapping("/{packageId}")
     public ResponseEntity<Map<String, String>> removePackage(@PathVariable String packageId) {
         String result = packageManagementService.removePackage(packageId);
+        // 스크립트 실행 결과가 오류인지 확인
+        if (result != null && (result.startsWith("오류:") || result.startsWith("❌"))) {
+            return ResponseEntity.status(500).body(Map.of("error", result));
+        }
         return ResponseEntity.ok(Map.of("message", result));
     }
     
@@ -77,6 +85,10 @@ public class PackageManagementController {
             @PathVariable String packageId,
             @PathVariable String action) {
         String result = packageManagementService.controlService(packageId, action);
+        // 스크립트 실행 결과가 오류인지 확인
+        if (result != null && (result.startsWith("오류:") || result.startsWith("❌"))) {
+            return ResponseEntity.status(500).body(Map.of("error", result));
+        }
         return ResponseEntity.ok(Map.of("message", result));
     }
     
@@ -89,6 +101,10 @@ public class PackageManagementController {
             @RequestBody Map<String, Boolean> request) {
         boolean enable = request.getOrDefault("enable", false);
         String result = packageManagementService.toggleAutostart(packageId, enable);
+        // 스크립트 실행 결과가 오류인지 확인
+        if (result != null && (result.startsWith("오류:") || result.startsWith("❌"))) {
+            return ResponseEntity.status(500).body(Map.of("error", result));
+        }
         return ResponseEntity.ok(Map.of("message", result));
     }
 }

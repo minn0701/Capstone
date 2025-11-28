@@ -19,12 +19,14 @@ public class PackageManagementService {
     
     /**
      * 지원하는 패키지 목록을 조회합니다.
+     * 모든 패키지 목록을 반환합니다 (installed: true/false 포함).
      */
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getPackageList() {
         List<Map<String, Object>> packages = scriptExecutor.executeScriptJsonArray("system/manage_packages.sh", "list");
         
         // installed를 boolean으로 변환하고, serviceStatus와 autoStart 추가
+        // 모든 패키지 반환 (설치/미설치 포함)
         return packages.stream()
                 .map(pkg -> {
                     Map<String, Object> result = new java.util.HashMap<>(pkg);

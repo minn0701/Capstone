@@ -69,8 +69,6 @@ export const apiDelete = (url, options = {}) => {
   return apiFetch(url, { ...options, method: 'DELETE' });
 };
 
-// mockFetch는 더 이상 사용하지 않지만, 하위 호환성을 위해 apiFetch로 별칭 제공
-export const mockFetch = apiFetch;
 
 /**
  * 응답을 안전하게 JSON으로 파싱합니다.
